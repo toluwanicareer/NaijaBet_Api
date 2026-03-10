@@ -22,6 +22,9 @@ endpoints = {
     },
     "sportybet": {
         "leagues": [{"sportId":"sr:sport:1","marketId":"1,18,10,29,11,26,36,14","tournamentId":[[{"sr:tournament:1"}]]}]  # noqa: E231, E501
+    },
+    "altenar": {
+        "leagues": "https://sb2frontend-altenar2.biahosted.com/api/widget/GetEventsByChamp?culture=en-GB&timezoneOffset=-60&integration={integration}&deviceType=1&numFormat=en-GB&countryCode=NG&champId=0&champIds={leagueid}"  # noqa: E501
     }
 
 }
@@ -29,23 +32,23 @@ endpoints = {
 
 # implement id's as enum
 class Betid(Enum):
-    PREMIERLEAGUE = 170880, 841, "EN_PR", 17
-    CHAMPIONSHIP = 170881, 863, "EN_CH", 18
-    LEAGUE_ONE = 995354, 909, "EN_L1", 24
-    LEAGUE_TWO = 995355, 939, "EN_L2", 25
-    BUNDESLIGA = 180923, 1007, "DE_BL", 35
-    BUNDESLIGA_2 = 180924, 1025, "DE_B2", 44
-    LALIGA = 180928, 1108, "ES_PL", 8
-    LIGUE_1 = 950503, 1104, "FR_L1", 34
-    LIGUE_2 = 958691, 1179, "FR_L2", 182
-    SERIEA = 167856, 3775, "IT_SA", 23
-    # replace betkings laliga id
+    PREMIERLEAGUE = 170880, 841, "EN_PR", 17, 2936
+    CHAMPIONSHIP = 170881, 863, "EN_CH", 18, 2937
+    LEAGUE_ONE = 995354, 909, "EN_L1", 24, 2947
+    LEAGUE_TWO = 995355, 939, "EN_L2", 25, 2946
+    BUNDESLIGA = 180923, 1007, "DE_BL", 35, 2950
+    BUNDESLIGA_2 = 180924, 1025, "DE_B2", 44, 2954
+    LALIGA = 180928, 1108, "ES_PL", 8, 2941
+    LIGUE_1 = 950503, 1104, "FR_L1", 34, 2943
+    LIGUE_2 = 958691, 1179, "FR_L2", 182, 2939
+    SERIEA = 167856, 3775, "IT_SA", 23, 2942
 
-    def __init__(self, bet9ja_id, betking_id, nairabet_id, sportybet_id):
+    def __init__(self, bet9ja_id, betking_id, nairabet_id, sportybet_id, altenar_id):
         self.bet9ja_id = bet9ja_id
         self.betking_id = betking_id
         self.nairabet_id = nairabet_id
         self.sportybet_id = sportybet_id
+        self.altenar_id = altenar_id
 
     def to_endpoint(self, betting_site):
         if betting_site == 'bet9ja':
@@ -63,6 +66,11 @@ class Betid(Enum):
         elif betting_site == 'nairabetDNB':
             endpoint_url = endpoints[betting_site]["leaguesDNB"].format(
                 leagueid=self.nairabet_id
+            )
+        elif betting_site == 'altenar':
+            endpoint_url = endpoints["altenar"]["leagues"].format(
+                leagueid=self.altenar_id,
+                integration="{integration}"
             )
         elif betting_site == 'sportybet':
             pprint(endpoints[betting_site]["leagues"])
