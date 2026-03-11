@@ -1,156 +1,81 @@
 """
-End-to-end tests for Bet9ja bookmaker.
-These tests make real API calls to verify the actual functionality.
+E2E test for Bet9ja — one real API call, validates all odds fields.
 """
 import pytest
 from NaijaBet_Api.bookmakers.bet9ja import Bet9ja
 from NaijaBet_Api.id import Betid
 
+REQUIRED_FIELDS = ['match', 'league', 'time', 'league_id', 'match_id']
+ODDS_1X2 = ['home', 'draw', 'away']
+ODDS_DC = ['home_or_draw', 'home_or_away', 'draw_or_away']
+ODDS_OU = ['over_2_5', 'under_2_5']
+ODDS_BTTS = ['btts_yes', 'btts_no']
+
 
 class TestBet9jaE2E:
-    """End-to-end tests for Bet9ja bookmaker"""
 
-    def test_initialization(self):
-        """Test that Bet9ja initializes correctly"""
+    @pytest.fixture(scope="class")
+    def league_data(self):
         bookmaker = Bet9ja()
-        assert bookmaker is not None
-        assert bookmaker.site == 'bet9ja'
-        assert bookmaker.session is not None
+        return bookmaker.get_league(Betid.PREMIERLEAGUE)
 
-    @pytest.mark.timeout(30)
-    def test_get_league_premier_league(self):
-        """Test getting Premier League odds"""
-        bookmaker = Bet9ja()
-        data = bookmaker.get_league(Betid.PREMIERLEAGUE)
+    def test_returns_list(self, league_data):
+        assert isinstance(league_data, list)
 
-        # Should return a list
-        assert isinstance(data, list), "get_league should return a list"
+    def test_has_matches(self, league_data):
+        assert len(league_data) > 0, "Expected at least one match"
 
-        # If there's data, validate structure
-        if len(data) > 0:
-            match = data[0]
-            # Check required fields exist
-            required_fields = ['match', 'league', 'time', 'league_id', 'match_id']
-            for field in required_fields:
-                assert field in match, f"Match should have '{field}' field"
+    def test_match_structure(self, league_data):
+        match = league_data[0]
+        for field in REQUIRED_FIELDS:
+            assert field in match, f"Missing '{field}'"
+        assert ' - ' in match['match']
+        assert isinstance(match['time'], int)
+        assert isinstance(match['league_id'], int)
+        assert isinstance(match['match_id'], int)
 
-            # Check that match is a string with " - " separator
-            assert isinstance(match['match'], str), "match should be a string"
-            assert ' - ' in match['match'], "match should contain ' - ' separator"
+    def test_1x2_odds(self, league_data):
+        match = league_data[0]
+        for field in ODDS_1X2:
+            assert field in match, f"Missing '{field}'"
+            assert isinstance(match[field], (int, float)), f"{field} not numeric"
+            assert match[field] > 1.0, f"{field}={match[field]} should be > 1.0"
 
-            # Check league is a string
-            assert isinstance(match['league'], str), "league should be a string"
+    def test_double_chance_odds(self, league_data):
+        match = league_data[0]
+        for field in ODDS_DC:
+            assert field in match, f"Missing '{field}'"
+            assert isinstance(match[field], (int, float)), f"{field} not numeric"
+            assert match[field] > 1.0, f"{field}={match[field]} should be > 1.0"
 
-            # Check time is an integer timestamp
-            assert isinstance(match['time'], int), "time should be an integer timestamp"
+    def test_over_under_odds(self, league_data):
+        match = league_data[0]
+        for field in ODDS_OU:
+            assert field in match, f"Missing '{field}'"
+            assert isinstance(match[field], (int, float)), f"{field} not numeric"
+            assert match[field] > 1.0, f"{field}={match[field]} should be > 1.0"
 
-            # Check IDs are integers
-            assert isinstance(match['league_id'], int), "league_id should be an integer"
-            assert isinstance(match['match_id'], int), "match_id should be an integer"
+        # Bet9ja extracts O/U lines via JMESPath (0.5 through 6.5)
+        ou_keys = [k for k in match if k.startswith("over_") or k.startswith("under_")]
+        assert len(ou_keys) >= 4, f"Expected multiple O/U lines, got {ou_keys}"
 
-            # Check odds fields if present
-            odds_fields = ['home', 'draw', 'away', 'home_or_draw', 'home_or_away', 'draw_or_away']
-            for field in odds_fields:
-                if field in match:
-                    assert isinstance(match[field], (int, float)), f"{field} should be numeric"
-                    assert match[field] > 0, f"{field} should be positive"
+    def test_btts_odds(self, league_data):
+        match = league_data[0]
+        for field in ODDS_BTTS:
+            assert field in match, f"Missing '{field}'"
+            assert isinstance(match[field], (int, float)), f"{field} not numeric"
+            assert match[field] > 1.0, f"{field}={match[field]} should be > 1.0"
 
-    @pytest.mark.timeout(30)
-    def test_get_league_la_liga(self):
-        """Test getting La Liga odds"""
-        bookmaker = Bet9ja()
-        data = bookmaker.get_league(Betid.LALIGA)
-
-        assert isinstance(data, list), "get_league should return a list"
-
-    @pytest.mark.timeout(30)
-    def test_get_league_bundesliga(self):
-        """Test getting Bundesliga odds"""
-        bookmaker = Bet9ja()
-        data = bookmaker.get_league(Betid.BUNDESLIGA)
-
-        assert isinstance(data, list), "get_league should return a list"
-
-    @pytest.mark.timeout(120)
-    def test_get_all(self):
-        """Test getting all leagues' odds"""
-        bookmaker = Bet9ja()
-        data = bookmaker.get_all()
-
-        # Should return a list
-        assert isinstance(data, list), "get_all should return a list"
-
-        # Should have data from multiple leagues (or at least be a valid list)
-        # Note: might be empty if no matches are available
-        if len(data) > 0:
-            # Validate structure of first match
-            match = data[0]
-            required_fields = ['match', 'league', 'time', 'league_id', 'match_id']
-            for field in required_fields:
-                assert field in match, f"Match should have '{field}' field"
-
-    @pytest.mark.timeout(30)
-    def test_get_team(self):
-        """Test getting odds for a specific team"""
-        bookmaker = Bet9ja()
-        # Search for a common team
-        data = bookmaker.get_team("Arsenal")
-
-        assert isinstance(data, list), "get_team should return a list"
-
-        # If matches found, verify they contain "Arsenal"
-        for match in data:
-            assert 'Arsenal' in match['match'], "Match should contain team name"
-
-    @pytest.mark.asyncio
-    @pytest.mark.timeout(30)
-    async def test_async_get_league(self):
-        """Test async version of get_league"""
-        bookmaker = Bet9ja(session_type='async')
-        try:
-            data = await bookmaker.async_get_league(Betid.PREMIERLEAGUE)
-
-            assert isinstance(data, (list, dict)), "async_get_league should return a list or dict"
-
-            if isinstance(data, list) and len(data) > 0:
-                match = data[0]
-                assert 'match' in match, "Match should have 'match' field"
-                assert 'league' in match, "Match should have 'league' field"
-        finally:
-            if hasattr(bookmaker, 'session') and bookmaker.session:
-                await bookmaker.session.close()
-
-    @pytest.mark.asyncio
-    @pytest.mark.timeout(120)
-    async def test_async_get_all(self):
-        """Test async version of get_all"""
-        bookmaker = Bet9ja(session_type='async')
-        # async_get_all closes the session, so no need for manual cleanup
-        data = await bookmaker.async_get_all()
-
-        assert isinstance(data, list), "async_get_all should return a list"
-
-        # Should be a list of unique matches
-        if len(data) > 0:
-            match = data[0]
-            assert 'match' in match, "Match should have 'match' field"
-
-    def test_multiple_requests(self):
-        """Test making multiple sequential requests"""
-        bookmaker = Bet9ja()
-
-        # Make multiple requests to test session persistence
-        data1 = bookmaker.get_league(Betid.PREMIERLEAGUE)
-        data2 = bookmaker.get_league(Betid.BUNDESLIGA)
-        data3 = bookmaker.get_league(Betid.LALIGA)
-
-        assert isinstance(data1, list)
-        assert isinstance(data2, list)
-        assert isinstance(data3, list)
-
-    def test_invalid_league_handling(self):
-        """Test that the API handles requests gracefully"""
-        bookmaker = Bet9ja()
-        # Just ensure it doesn't crash - might return empty list or dict
-        data = bookmaker.get_league(Betid.PREMIERLEAGUE)
-        assert data is not None, "Should return something even if no data"
+    def test_all_odds_summary(self, league_data):
+        """Print a summary of the first match for manual verification."""
+        match = league_data[0]
+        all_odds = ODDS_1X2 + ODDS_DC + ODDS_OU + ODDS_BTTS
+        present = [f for f in all_odds if f in match]
+        missing = [f for f in all_odds if f not in match]
+        ou_keys = sorted([k for k in match if k.startswith("over_") or k.startswith("under_")])
+        print(f"\n  Match: {match['match']}")
+        print(f"  League: {match['league']}")
+        print(f"  Present: {present}")
+        print(f"  Missing: {missing}")
+        print(f"  O/U lines: {ou_keys}")
+        assert len(missing) == 0, f"Missing odds fields: {missing}"
