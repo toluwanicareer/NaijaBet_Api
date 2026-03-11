@@ -256,6 +256,8 @@ class AltenarBaseClass(BookmakerBaseClass):
         """Fetch odds for all implemented leagues."""
         self.data = []
         for league in Betid:
+            if league.altenar_id == 0:
+                continue
             self.data += self.get_league(league)
         return self.data
 

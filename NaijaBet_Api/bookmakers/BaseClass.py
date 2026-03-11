@@ -85,6 +85,8 @@ class BookmakerBaseClass(metaclass=ABCMeta):
         for league in Betid:
             if self.data == {}:
                 continue
+            if league.bet9ja_id == 0:
+                continue
             self.data += self.get_league(league)
         return self.data
 
