@@ -42,7 +42,10 @@ def match_normalizer(list, pathstr: str):
 
     # List of odds fields that should be converted to floats
     odds_fields = ['home', 'draw', 'away', 'home_or_draw', 'home_or_away', 'draw_or_away',
-                   'over_2_5', 'under_2_5', 'btts_yes', 'btts_no']
+                   'over_0_5', 'under_0_5', 'over_1_5', 'under_1_5',
+                   'over_2_5', 'under_2_5', 'over_3_5', 'under_3_5',
+                   'over_4_5', 'under_4_5', 'over_5_5', 'under_5_5',
+                   'over_6_5', 'under_6_5', 'btts_yes', 'btts_no']
 
     for event in data:
         teams = event.get("match", None)

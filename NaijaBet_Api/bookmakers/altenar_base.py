@@ -23,6 +23,12 @@ OVER_UNDER_TYPE_MAP = {
     13: "under_{line}",
 }
 
+_EVENT_DETAILS_URL = (
+    "https://sb2frontend-altenar2.biahosted.com/api/widget/GetEventDetails"
+    "?culture=en-GB&timezoneOffset=-60&integration={integration}"
+    "&deviceType=1&numFormat=en-GB&countryCode=NG&eventId={event_id}"
+)
+
 
 class AltenarBaseClass(BookmakerBaseClass):
     """
@@ -63,9 +69,67 @@ class AltenarBaseClass(BookmakerBaseClass):
         """Build the Altenar API URL for a league."""
         return league.to_endpoint('altenar').format(integration=self._integration)
 
+    def _fetch_event_odds(self, event_id: int) -> Dict[str, float]:
+        """
+        Fetch all odds for a single event from GetEventDetails.
+
+        Returns a dict of all available odds including all over/under lines.
+        """
+        url = _EVENT_DETAILS_URL.format(
+            integration=self._integration, event_id=event_id
+        )
+        try:
+            res = self.session.get(url)
+            if res.status_code != 200:
+                return {}
+            data = res.json()
+        except Exception:
+            return {}
+
+        markets = data.get("markets", [])
+        odds_list = data.get("odds", [])
+        odds_by_id = {o["id"]: o for o in odds_list}
+
+        # Collect oddIds from Total markets (typeId=18) for over/under extraction
+        total_odd_ids = set()
+        for m in markets:
+            if m.get("typeId") == 18:
+                for row in m.get("desktopOddIds", []):
+                    if isinstance(row, list):
+                        total_odd_ids.update(row)
+
+        odds_dict = {}
+
+        # Extract standard odds from all odds in the response
+        for odd in odds_list:
+            type_id = odd.get("typeId")
+            price = odd.get("price")
+            if price is None:
+                continue
+
+            # Standard markets (1x2, double chance, BTTS)
+            field = ODDS_TYPE_MAP.get(type_id)
+            if field and field not in odds_dict:
+                odds_dict[field] = price
+                continue
+
+            # Over/Under from the Total market only
+            if odd["id"] in total_odd_ids:
+                sv = odd.get("sv", "")
+                if not sv:
+                    continue
+                line_key = sv.replace(".", "_")
+                if type_id == 12:
+                    odds_dict[f"over_{line_key}"] = price
+                elif type_id == 13:
+                    odds_dict[f"under_{line_key}"] = price
+
+        return odds_dict
+
     def normalizer(self, data: Any) -> List[Dict[str, Any]]:
         """
         Join the relational Altenar response into standardized match dicts.
+        Used for basic league-level data (without event details enrichment).
         """
         if not data or not isinstance(data, dict):
             return []
@@ -102,8 +166,8 @@ class AltenarBaseClass(BookmakerBaseClass):
                         match_odds[field] = odd.get("price")
                         continue
 
-                    # Over/Under: only include the 2.5 line
-                    if market_type == 18 and market.get("sv") == "2.5":
+                    # Over/Under from Total markets
+                    if market_type == 18:
                         ou_field = OVER_UNDER_TYPE_MAP.get(type_id)
                         if ou_field:
                             line = market.get("sv", "").replace(".", "_")
@@ -133,20 +197,60 @@ class AltenarBaseClass(BookmakerBaseClass):
         return results
 
     def get_league(self, league: Betid = Betid.PREMIERLEAGUE) -> List[Dict[str, Any]]:
-        """Fetch odds for a league via the Altenar API."""
+        """
+        Fetch odds for a league via the Altenar API.
+
+        First fetches the league event list, then for each event
+        fetches detailed odds (including all over/under lines).
+        """
         try:
             url = self._build_url(league)
             res = self.session.get(url)
             if res.status_code != 200:
                 print(f"Warning: HTTP {res.status_code} for {self._integration}")
                 return []
-            data = res.json()
-            if data is None:
+            league_data = res.json()
+            if league_data is None:
                 return []
-            return self.normalizer(data)
         except Exception as e:
             print(f"Error fetching league for {self._integration}: {e}")
             return []
+
+        events = league_data.get("events", [])
+        if not events:
+            return []
+
+        champs_list = league_data.get("champs", [])
+        champs_by_id = {c["id"]: c for c in champs_list}
+
+        results = []
+        for event in events:
+            champ = champs_by_id.get(event.get("champId"), {})
+
+            name = event.get("name", "")
+            match_name = name.replace(" vs. ", " - ")
+
+            start_date = event.get("startDate", "")
+            try:
+                time_val = arrow.get(start_date).int_timestamp
+            except Exception:
+                time_val = 0
+
+            match_dict = {
+                "match": match_name,
+                "league": champ.get("name", ""),
+                "time": time_val,
+                "league_id": event.get("champId", 0),
+                "match_id": event.get("id", 0),
+            }
+
+            # Fetch full odds from event details
+            event_odds = self._fetch_event_odds(event.get("id", 0))
+            match_dict.update(event_odds)
+
+            results.append(match_dict)
+
+        return results
 
     def get_all(self) -> List[Dict[str, Any]]:
         """Fetch odds for all implemented leagues."""

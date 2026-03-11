@@ -117,7 +117,7 @@ class TestNairabetAltenarE2E:
         nb = NairabetAltenar(proxies={"https": "http://proxy:8080"})
         assert nb.session.proxies == {"https": "http://proxy:8080"}
 
-    @pytest.mark.timeout(30)
+    @pytest.mark.timeout(120)
     def test_get_league_premier_league(self):
         nb = NairabetAltenar()
         data = nb.get_league(Betid.PREMIERLEAGUE)
@@ -139,13 +139,17 @@ class TestNairabetAltenarE2E:
             assert isinstance(match["btts_yes"], float)
             assert isinstance(match["time"], int)
 
-    @pytest.mark.timeout(30)
+            # Should have multiple over/under lines from event details
+            ou_keys = [k for k in match if k.startswith("over_") or k.startswith("under_")]
+            assert len(ou_keys) > 4, f"Expected multiple O/U lines, got {ou_keys}"
+
+    @pytest.mark.timeout(120)
     def test_get_league_la_liga(self):
         nb = NairabetAltenar()
         data = nb.get_league(Betid.LALIGA)
         assert isinstance(data, list)
 
-    @pytest.mark.timeout(60)
+    @pytest.mark.timeout(300)
     def test_get_all(self):
         nb = NairabetAltenar()
         data = nb.get_all()
@@ -159,7 +163,7 @@ class TestBetkingAltenarE2E:
         bk = BetkingAltenar()
         assert bk._integration == "betking"
 
-    @pytest.mark.timeout(30)
+    @pytest.mark.timeout(120)
     def test_get_league_premier_league(self):
         bk = BetkingAltenar()
         data = bk.get_league(Betid.PREMIERLEAGUE)
@@ -178,13 +182,17 @@ class TestBetkingAltenarE2E:
             assert isinstance(match["over_2_5"], float)
             assert isinstance(match["btts_yes"], float)
 
-    @pytest.mark.timeout(30)
+            # Should have multiple over/under lines from event details
+            ou_keys = [k for k in match if k.startswith("over_") or k.startswith("under_")]
+            assert len(ou_keys) > 4, f"Expected multiple O/U lines, got {ou_keys}"
+
+    @pytest.mark.timeout(120)
     def test_get_league_bundesliga(self):
         bk = BetkingAltenar()
         data = bk.get_league(Betid.BUNDESLIGA)
         assert isinstance(data, list)
 
-    @pytest.mark.timeout(60)
+    @pytest.mark.timeout(300)
     def test_get_all(self):
         bk = BetkingAltenar()
         data = bk.get_all()

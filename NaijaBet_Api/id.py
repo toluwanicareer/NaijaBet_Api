@@ -25,6 +25,9 @@ endpoints = {
     },
     "altenar": {
         "leagues": "https://sb2frontend-altenar2.biahosted.com/api/widget/GetEventsByChamp?culture=en-GB&timezoneOffset=-60&integration={integration}&deviceType=1&numFormat=en-GB&countryCode=NG&champId=0&champIds={leagueid}"  # noqa: E501
+    },
+    "twentytwobet": {
+        "leagues": "https://22bet.ng/service-api/LineFeed/Get1x2_VZip?sports=1&champs={leagueid}&count=50&lng=en&tf=3000000&tz=1&mode=4&country=159"  # noqa: E501
     }
 
 }
@@ -32,23 +35,24 @@ endpoints = {
 
 # implement id's as enum
 class Betid(Enum):
-    PREMIERLEAGUE = 170880, 841, "EN_PR", 17, 2936
-    CHAMPIONSHIP = 170881, 863, "EN_CH", 18, 2937
-    LEAGUE_ONE = 995354, 909, "EN_L1", 24, 2947
-    LEAGUE_TWO = 995355, 939, "EN_L2", 25, 2946
-    BUNDESLIGA = 180923, 1007, "DE_BL", 35, 2950
-    BUNDESLIGA_2 = 180924, 1025, "DE_B2", 44, 2954
-    LALIGA = 180928, 1108, "ES_PL", 8, 2941
-    LIGUE_1 = 950503, 1104, "FR_L1", 34, 2943
-    LIGUE_2 = 958691, 1179, "FR_L2", 182, 2939
-    SERIEA = 167856, 3775, "IT_SA", 23, 2942
+    PREMIERLEAGUE = 170880, 841, "EN_PR", 17, 2936, 88637
+    CHAMPIONSHIP = 170881, 863, "EN_CH", 18, 2937, 105759
+    LEAGUE_ONE = 995354, 909, "EN_L1", 24, 2947, 13709
+    LEAGUE_TWO = 995355, 939, "EN_L2", 25, 2946, 24637
+    BUNDESLIGA = 180923, 1007, "DE_BL", 35, 2950, 96463
+    BUNDESLIGA_2 = 180924, 1025, "DE_B2", 44, 2954, 109313
+    LALIGA = 180928, 1108, "ES_PL", 8, 2941, 127733
+    LIGUE_1 = 950503, 1104, "FR_L1", 34, 2943, 12821
+    LIGUE_2 = 958691, 1179, "FR_L2", 182, 2939, 12829
+    SERIEA = 167856, 3775, "IT_SA", 23, 2942, 110163
 
-    def __init__(self, bet9ja_id, betking_id, nairabet_id, sportybet_id, altenar_id):
+    def __init__(self, bet9ja_id, betking_id, nairabet_id, sportybet_id, altenar_id, twentytwobet_id):
         self.bet9ja_id = bet9ja_id
         self.betking_id = betking_id
         self.nairabet_id = nairabet_id
         self.sportybet_id = sportybet_id
         self.altenar_id = altenar_id
+        self.twentytwobet_id = twentytwobet_id
 
     def to_endpoint(self, betting_site):
         if betting_site == 'bet9ja':
@@ -71,6 +75,10 @@ class Betid(Enum):
             endpoint_url = endpoints["altenar"]["leagues"].format(
                 leagueid=self.altenar_id,
                 integration="{integration}"
+            )
+        elif betting_site == 'twentytwobet':
+            endpoint_url = endpoints[betting_site]["leagues"].format(
+                leagueid=self.twentytwobet_id
             )
         elif betting_site == 'sportybet':
             pprint(endpoints[betting_site]["leagues"])
