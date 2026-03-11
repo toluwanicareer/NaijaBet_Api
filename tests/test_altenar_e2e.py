@@ -62,11 +62,13 @@ class TestAltenarBaseClass:
                 "name": "Team A vs. Team B",
                 "startDate": "2026-03-14T15:00:00Z",
                 "champId": 2936,
-                "marketIds": [1, 2],
+                "marketIds": [1, 2, 3, 4],
             }],
             "markets": [
                 {"id": 1, "name": "1x2", "oddIds": [10, 11, 12], "typeId": 1},
                 {"id": 2, "name": "Double chance", "oddIds": [20, 21, 22], "typeId": 10},
+                {"id": 3, "name": "Total", "oddIds": [30, 31], "typeId": 18, "sv": "2.5"},
+                {"id": 4, "name": "Both Teams To Score", "oddIds": [40, 41], "typeId": 29},
             ],
             "odds": [
                 {"id": 10, "typeId": 1, "price": 2.5, "name": "Team A"},
@@ -75,6 +77,10 @@ class TestAltenarBaseClass:
                 {"id": 20, "typeId": 9, "price": 1.5, "name": "Team A or draw"},
                 {"id": 21, "typeId": 10, "price": 1.3, "name": "Team A or Team B"},
                 {"id": 22, "typeId": 11, "price": 1.4, "name": "Draw or Team B"},
+                {"id": 30, "typeId": 12, "price": 1.72, "name": "Over 2.5"},
+                {"id": 31, "typeId": 13, "price": 2.13, "name": "Under 2.5"},
+                {"id": 40, "typeId": 74, "price": 1.65, "name": "GG"},
+                {"id": 41, "typeId": 76, "price": 2.20, "name": "NG"},
             ],
             "champs": [{"id": 2936, "name": "Premier League"}],
         }
@@ -92,6 +98,10 @@ class TestAltenarBaseClass:
         assert match["home_or_draw"] == 1.5
         assert match["home_or_away"] == 1.3
         assert match["draw_or_away"] == 1.4
+        assert match["over_2_5"] == 1.72
+        assert match["under_2_5"] == 2.13
+        assert match["btts_yes"] == 1.65
+        assert match["btts_no"] == 2.20
         assert isinstance(match["time"], int)
 
 
@@ -120,7 +130,13 @@ class TestNairabetAltenarE2E:
             assert "away" in match
             assert "time" in match
             assert "league" in match
+            assert "over_2_5" in match
+            assert "under_2_5" in match
+            assert "btts_yes" in match
+            assert "btts_no" in match
             assert isinstance(match["home"], float)
+            assert isinstance(match["over_2_5"], float)
+            assert isinstance(match["btts_yes"], float)
             assert isinstance(match["time"], int)
 
     @pytest.mark.timeout(30)
@@ -154,7 +170,13 @@ class TestBetkingAltenarE2E:
             assert "home" in match
             assert "draw" in match
             assert "away" in match
+            assert "over_2_5" in match
+            assert "under_2_5" in match
+            assert "btts_yes" in match
+            assert "btts_no" in match
             assert isinstance(match["home"], float)
+            assert isinstance(match["over_2_5"], float)
+            assert isinstance(match["btts_yes"], float)
 
     @pytest.mark.timeout(30)
     def test_get_league_bundesliga(self):

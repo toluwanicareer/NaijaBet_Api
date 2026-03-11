@@ -13,6 +13,14 @@ ODDS_TYPE_MAP = {
     9: "home_or_draw",
     10: "home_or_away",
     11: "draw_or_away",
+    74: "btts_yes",
+    76: "btts_no",
+}
+
+# Over/Under odds typeId -> field name (needs market context to filter by line)
+OVER_UNDER_TYPE_MAP = {
+    12: "over_{line}",
+    13: "under_{line}",
 }
 
 
@@ -78,16 +86,28 @@ class AltenarBaseClass(BookmakerBaseClass):
         for event in events:
             champ = champs_by_id.get(event.get("champId"), {})
 
-            # Collect odds from 1x2 and double chance markets
+            # Collect odds from all supported markets
             match_odds = {}
             for mid in event.get("marketIds", []):
                 market = markets_by_id.get(mid, {})
+                market_type = market.get("typeId")
+
                 for oid in market.get("oddIds", []):
                     odd = odds_by_id.get(oid, {})
                     type_id = odd.get("typeId")
+
+                    # Standard markets (1x2, double chance, BTTS)
                     field = ODDS_TYPE_MAP.get(type_id)
                     if field:
                         match_odds[field] = odd.get("price")
+                        continue
+
+                    # Over/Under: only include the 2.5 line
+                    if market_type == 18 and market.get("sv") == "2.5":
+                        ou_field = OVER_UNDER_TYPE_MAP.get(type_id)
+                        if ou_field:
+                            line = market.get("sv", "").replace(".", "_")
+                            match_odds[ou_field.format(line=line)] = odd.get("price")
 
             # Convert "Team A vs. Team B" to "Team A - Team B"
             name = event.get("name", "")
