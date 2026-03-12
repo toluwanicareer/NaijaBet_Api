@@ -152,7 +152,7 @@ TOURNAMENT_MAP = {
 _OUTCOME_MAP = {
     (2, 0): "home", (2, 1): "draw", (2, 3): "away",
     (3, 10): "home_or_draw", (3, 8): "home_or_away", (3, 9): "draw_or_away",
-    (6, 6): "btts_yes", (6, 7): "btts_no",
+    (28, 14): "btts_yes", (28, 15): "btts_no",
     (5, 4): "over", (5, 5): "under",
 }
 
@@ -246,7 +246,7 @@ def _parse_markets(markets_data):
             if not isinstance(header, list) or len(header) < 4:
                 continue
             ev_id, period, mtype, sub = header[0], header[1], header[2], header[3]
-            if period != 1 or sub != 0 or mtype not in (2, 3, 5, 6):
+            if period != 1 or sub != 0 or mtype not in (2, 3, 5, 28):
                 continue
             if ev_id not in odds:
                 odds[ev_id] = {}
