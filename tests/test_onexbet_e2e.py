@@ -1,8 +1,9 @@
 """
-E2E test for 22bet — one real API call, validates all odds fields.
+E2E test for 1xbet.ng — one real API call, validates all odds fields.
 """
 import pytest
-from NaijaBet_Api.bookmakers.twentytwobet import TwentyTwoBet, ODDS_MAP
+from NaijaBet_Api.bookmakers.onexbet import OneXBet
+from NaijaBet_Api.bookmakers.onexbet_base import ODDS_MAP
 from NaijaBet_Api.id import Betid
 
 REQUIRED_FIELDS = ['match', 'league', 'time', 'league_id', 'match_id']
@@ -14,16 +15,16 @@ ODDS_BTTS = ['btts_yes', 'btts_no']
 
 # --- Unit tests (no network) ---
 
-class TestTwentyTwoBetNormalizer:
+class TestOneXBetNormalizer:
 
     def test_normalizer_empty_input(self):
-        tb = TwentyTwoBet()
-        assert tb.normalizer(None) == []
-        assert tb.normalizer({}) == []
-        assert tb.normalizer({"Value": []}) == []
+        ob = OneXBet()
+        assert ob.normalizer(None) == []
+        assert ob.normalizer({}) == []
+        assert ob.normalizer({"Value": []}) == []
 
     def test_normalizer_parses_match_data(self):
-        tb = TwentyTwoBet()
+        ob = OneXBet()
         mock_response = {
             "Value": [{
                 "O1": "Arsenal", "O2": "Chelsea",
@@ -43,7 +44,7 @@ class TestTwentyTwoBetNormalizer:
                 ],
             }]
         }
-        result = tb.normalizer(mock_response)
+        result = ob.normalizer(mock_response)
         assert len(result) == 1
         m = result[0]
         assert m["match"] == "Arsenal - Chelsea"
@@ -59,23 +60,34 @@ class TestTwentyTwoBetNormalizer:
         assert m["btts_no"] == 2.2
 
     def test_normalizer_skips_events_without_teams(self):
-        tb = TwentyTwoBet()
+        ob = OneXBet()
         mock_response = {
             "Value": [
                 {"O1": "", "O2": "Chelsea", "S": 0, "I": 1, "L": "Test", "LI": 1, "E": []},
                 {"O1": "Arsenal", "O2": "", "S": 0, "I": 2, "L": "Test", "LI": 1, "E": []},
             ]
         }
-        assert len(tb.normalizer(mock_response)) == 0
+        assert len(ob.normalizer(mock_response)) == 0
+
+    def test_proxy_support(self):
+        ob = OneXBet(proxies={"https": "http://user:pass@proxy:8080"})
+        assert ob.session.proxies == {"https": "http://user:pass@proxy:8080"}
+
+    def test_site_config(self):
+        ob = OneXBet()
+        assert ob.site == 'onexbet'
+        assert ob._domain == 'https://1xbet.ng'
+        assert ob._country == 132
+        assert ob._partner == 159
 
 
 # --- E2E ---
 
-class TestTwentyTwoBetE2E:
+class TestOneXBetE2E:
 
     @pytest.fixture(scope="class")
     def league_data(self):
-        return TwentyTwoBet().get_league(Betid.PREMIERLEAGUE)
+        return OneXBet().get_league(Betid.PREMIERLEAGUE)
 
     def test_returns_list_with_matches(self, league_data):
         assert isinstance(league_data, list)

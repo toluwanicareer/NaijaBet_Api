@@ -1,0 +1,225 @@
+{
+  "d": {
+    "regions": {
+      "189620": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/37d2ed1f8c08_3983"
+      },
+      "189621": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/3b5d605b0441_3984"
+      },
+      "189622": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/2e5a7dfee2af_4090"
+      },
+      "190003": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/48678ce163e7_4089"
+      },
+      "189998": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/7804246adc8b_4043"
+      },
+      "190006": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/968c15a98e5b_4087"
+      },
+      "190009": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/74f2a1b980b0_4088"
+      },
+      "189982": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/05087e031b19_3987"
+      },
+      "189623": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/83d9c46394bc_3989"
+      },
+      "188566": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/10/01cecf3cba71_241700"
+      },
+      "189602": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/12/6a0ebd83e366_1468313"
+      },
+      "189818": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/885f06394d1f_4064"
+      },
+      "189624": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/66d525a985c2_3990"
+      },
+      "189625": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/4360e5a89d80_3992"
+      },
+      "189652": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/0baedaa19fb9_4015"
+      },
+      "189626": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/62e3e35c13b8_3993"
+      },
+      "188567": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/12/29ce337a6b3e_1468319"
+      },
+      "189627": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/cc29d26d7cfa_3994"
+      },
+      "189618": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/9af7e32814ad_4092"
+      },
+      "189655": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189628": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/4597535d403a_4095"
+      },
+      "189629": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/c44bdbd7ac39_3985"
+      },
+      "190004": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/efdc11579b04_4086"
+      },
+      "189630": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/1c4a78604de6_3995"
+      },
+      "189632": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/dbbc68642819_4004"
+      },
+      "11316": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189370": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189607": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189608": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189609": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189610": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189611": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189645": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189647": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189648": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189649": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189989": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189996": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/5774a16dcb38_4008"
+      },
+      "189633": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/0ccd0dd642ae_3996"
+      },
+      "190007": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/edfdaefe15a8_4091"
+      },
+      "189634": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/868b12fea237_3997"
+      },
+      "189635": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/a36b0a13253c_3998"
+      },
+      "189636": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/c1f601a81675_3999"
+      },
+      "190000": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/1f2970997646_4096"
+      },
+      "188957": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/771ddc3ce650_4014"
+      },
+      "189651": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/771ddc3ce650_4014"
+      },
+      "189638": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/dd158a37263b_4000"
+      },
+      "189639": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/26da64387360_4001"
+      },
+      "189640": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/fc94c950f1f5_4002"
+      },
+      "190001": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/2c8e90bd42f0_4085"
+      },
+      "189641": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/20004d48adc6_4003"
+      },
+      "189999": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/1604ecc35bba_4083"
+      },
+      "189642": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/dbbc68642819_4004"
+      },
+      "190002": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/2dabd5bbd9b9_4084"
+      },
+      "190005": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/ab8d3dd34ec9_4094"
+      },
+      "189643": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/242c79fcb76d_4005"
+      },
+      "189644": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/07/bf024cba905f_4007"
+      },
+      "11446": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2024/11/2fd326c300b2_249530"
+      },
+      "11500": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/01/94ddae5859b7_1586907"
+      },
+      "10020": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/03/6528157ee6c9_1673481"
+      },
+      "10023": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/03/638bcabc1458_1673492"
+      },
+      "11487": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/03/9a314d8923c4_1673503"
+      },
+      "11326": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/03/4be89e60274c_1673514"
+      },
+      "190049": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/05/130508e00dd4_1757538"
+      },
+      "189813": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/05/b3b4c3e19aea_1757575"
+      },
+      "11501": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/08/8b81aabf8735_1780519"
+      },
+      "11537": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/07/077b3c6ead51_1821561"
+      },
+      "189438": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/09/ab79b9b6ea55_1901969"
+      },
+      "189658": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/12/ac9cb49d3b68_2375386"
+      },
+      "188971": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/12/54a22d3964a0_2378443"
+      },
+      "11318": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/12/ce22d1660aaf_2378963"
+      },
+      "11325": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/12/f608802bc4bf_2403691"
+      },
+      "188785": {
+        "flagImagePathTemplate": "https://assets.gmlinteractive.com/2025/05/3fb3b2ce7f3e_295585"
+      }
+    }
+  }
+}

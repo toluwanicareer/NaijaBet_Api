@@ -1,0 +1,519 @@
+{
+  "data": {
+    "betsOfDay": [
+      {
+        "url": "/casino/?panel=offerDetails&id=57285",
+        "teams": [],
+        "title": "5 Free Spins, for new members!",
+        "navigationAction": 0,
+        "id": 64461,
+        "subtitle": "",
+        "image": "https://assets.gmlinteractive.com/2025/11/a08e3c4079f2_64461.webp",
+        "imageDesktopX1Webp": "https://assets.gmlinteractive.com/2025/11/a08e3c4079f2_64461-400x200.webp",
+        "imageDesktopX2Webp": "https://assets.gmlinteractive.com/2025/11/a08e3c4079f2_64461-800x400.webp",
+        "imageDesktopX3Webp": "https://assets.gmlinteractive.com/2025/11/a08e3c4079f2_64461.webp",
+        "imageMobileX1Webp": "https://assets.gmlinteractive.com/2025/11/a08e3c4079f2_64461-320x160.webp",
+        "imageMobileX2Webp": "https://assets.gmlinteractive.com/2025/11/a08e3c4079f2_64461-640x320.webp",
+        "imageMobileX3Webp": "https://assets.gmlinteractive.com/2025/11/a08e3c4079f2_64461.webp",
+        "type": 17
+      },
+      {
+        "collectionId": 0,
+        "url": "/live/nottingham-forest-fc-midtjylland/81662034/",
+        "seoUrl": "/live/nottingham-forest-fc-midtjylland/81662034/",
+        "moreButtonUrl": "/live/nottingham-forest-fc-midtjylland/81662034?ms=MRES&msname=Match+Result",
+        "teams": [
+          "Nottingham Forest",
+          "FC Midtjylland"
+        ],
+        "eventId": "81662034",
+        "sportId": "FOOT",
+        "isLiveNow": true,
+        "liveData": {
+          "score": {
+            "home": "0",
+            "away": "0"
+          },
+          "clock": {
+            "secondsSinceStart": 4091
+          },
+          "results": {
+            "goal": {
+              "home": "0",
+              "away": "0"
+            },
+            "standardTimeScore": {
+              "home": "0",
+              "away": "0"
+            },
+            "extraTimeScore": {
+              "home": "-",
+              "away": "-"
+            },
+            "shootoutScore": {
+              "home": "-",
+              "away": "-"
+            },
+            "penaltyShootout": {
+              "home": [],
+              "away": []
+            },
+            "penalties": {
+              "home": "0",
+              "away": "0"
+            },
+            "yellow": {
+              "home": "1",
+              "away": "0"
+            },
+            "corners": {
+              "home": "5",
+              "away": "1"
+            },
+            "injuryTime": 0
+          },
+          "periodDescription": ""
+        },
+        "market": {
+          "id": "2636640352",
+          "name": "Match Result",
+          "type": "MRES",
+          "typeId": 1,
+          "handicap": 0.0,
+          "marketCloseTimeMillis": 1773345600000,
+          "renderingLayout": 4,
+          "selections": [
+            {
+              "id": "9112340448",
+              "name": "1",
+              "fullName": "Nottingham Forest",
+              "price": 2.25,
+              "handicap": 0.0,
+              "betRef": "9112340448",
+              "renderingLayout": 4,
+              "columnIndex": 0
+            },
+            {
+              "id": "9112340449",
+              "name": "X",
+              "fullName": "Draw",
+              "price": 1.95,
+              "handicap": 0.0,
+              "betRef": "9112340449",
+              "renderingLayout": 4,
+              "columnIndex": 1
+            },
+            {
+              "id": "9112340450",
+              "name": "2",
+              "fullName": "FC Midtjylland",
+              "price": 10.0,
+              "handicap": 0.0,
+              "betRef": "9112340450",
+              "renderingLayout": 4,
+              "columnIndex": 2
+            }
+          ],
+          "scorerSelections": [],
+          "exactScoreSelections": []
+        },
+        "eventImage": "https://assets.gmlinteractive.com/2026/03/Forest-imago-2026-180x200.webp",
+        "eventImageStandard": "https://assets.gmlinteractive.com/2026/03/Forest-imago-2026-540x600.webp",
+        "eventImageRetina": "https://assets.gmlinteractive.com/2026/03/Forest-imago-2026-720x800.webp",
+        "eventImageDesktopX1Webp": "https://assets.gmlinteractive.com/2026/03/Forest-imago-2026-180x200.webp",
+        "eventImageDesktopX2Webp": "https://assets.gmlinteractive.com/2026/03/Forest-imago-2026-360x400.webp",
+        "eventImageDesktopX3Webp": "https://assets.gmlinteractive.com/2026/03/Forest-imago-2026-480x600.webp",
+        "eventImageMobileX1Webp": "https://assets.gmlinteractive.com/2026/03/Forest-imago-2026-144x160.webp",
+        "eventImageMobileX2Webp": "https://assets.gmlinteractive.com/2026/03/Forest-imago-2026-288x320.webp",
+        "eventImageMobileX3Webp": "https://assets.gmlinteractive.com/2026/03/Forest-imago-2026-432x480.webp",
+        "themeImage": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageDesktopX1Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageDesktopX2Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageDesktopX3Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageMobileX1Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageMobileX2Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageMobileX3Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "navigationAction": 0,
+        "type": 1
+      },
+      {
+        "collectionId": 0,
+        "url": "/live/rc-celta-de-vigo-olympique-lyonnais/81662073/",
+        "seoUrl": "/live/rc-celta-de-vigo-olympique-lyonnais/81662073/",
+        "moreButtonUrl": "/live/rc-celta-de-vigo-olympique-lyonnais/81662073?ms=MRES&msname=Match+Result",
+        "teams": [
+          "RC Celta de Vigo",
+          "Olympique Lyonnais"
+        ],
+        "eventId": "81662073",
+        "sportId": "FOOT",
+        "isLiveNow": true,
+        "liveData": {
+          "score": {
+            "home": "1",
+            "away": "0"
+          },
+          "clock": {
+            "secondsSinceStart": 4287
+          },
+          "results": {
+            "red": {
+              "home": "1",
+              "away": "0"
+            },
+            "goal": {
+              "home": "1",
+              "away": "0"
+            },
+            "standardTimeScore": {
+              "home": "1",
+              "away": "0"
+            },
+            "extraTimeScore": {
+              "home": "-",
+              "away": "-"
+            },
+            "shootoutScore": {
+              "home": "-",
+              "away": "-"
+            },
+            "penaltyShootout": {
+              "home": [],
+              "away": []
+            },
+            "penalties": {
+              "home": "0",
+              "away": "0"
+            },
+            "yellow": {
+              "home": "2",
+              "away": "1"
+            },
+            "corners": {
+              "home": "0",
+              "away": "5"
+            },
+            "scorers": [
+              {
+                "goalsDescription": "25' J. Rueda",
+                "homeAway": "home"
+              }
+            ],
+            "injuryTime": 0
+          },
+          "periodDescription": ""
+        },
+        "market": {
+          "id": "2636641825",
+          "name": "Match Result",
+          "type": "MRES",
+          "typeId": 1,
+          "handicap": 0.0,
+          "marketCloseTimeMillis": 1773345600000,
+          "renderingLayout": 4,
+          "selections": [
+            {
+              "id": "9112347926",
+              "name": "1",
+              "fullName": "RC Celta de Vigo",
+              "price": 1.47,
+              "handicap": 0.0,
+              "betRef": "9112347926",
+              "renderingLayout": 4,
+              "columnIndex": 0
+            },
+            {
+              "id": "9112347927",
+              "name": "X",
+              "fullName": "Draw",
+              "price": 3.4,
+              "handicap": 0.0,
+              "betRef": "9112347927",
+              "renderingLayout": 4,
+              "columnIndex": 1
+            },
+            {
+              "id": "9112347928",
+              "name": "2",
+              "fullName": "Olympique Lyonnais",
+              "price": 12.0,
+              "handicap": 0.0,
+              "betRef": "9112347928",
+              "renderingLayout": 4,
+              "columnIndex": 2
+            }
+          ],
+          "scorerSelections": [],
+          "exactScoreSelections": []
+        },
+        "eventImage": "https://assets.gmlinteractive.com/2026/02/Celta-imago-2026-3-180x200.webp",
+        "eventImageStandard": "https://assets.gmlinteractive.com/2026/02/Celta-imago-2026-3-540x600.webp",
+        "eventImageRetina": "https://assets.gmlinteractive.com/2026/02/Celta-imago-2026-3-720x800.webp",
+        "eventImageDesktopX1Webp": "https://assets.gmlinteractive.com/2026/02/Celta-imago-2026-3-180x200.webp",
+        "eventImageDesktopX2Webp": "https://assets.gmlinteractive.com/2026/02/Celta-imago-2026-3-360x400.webp",
+        "eventImageDesktopX3Webp": "https://assets.gmlinteractive.com/2026/02/Celta-imago-2026-3-480x600.webp",
+        "eventImageMobileX1Webp": "https://assets.gmlinteractive.com/2026/02/Celta-imago-2026-3-144x160.webp",
+        "eventImageMobileX2Webp": "https://assets.gmlinteractive.com/2026/02/Celta-imago-2026-3-288x320.webp",
+        "eventImageMobileX3Webp": "https://assets.gmlinteractive.com/2026/02/Celta-imago-2026-3-432x480.webp",
+        "themeImage": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageDesktopX1Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageDesktopX2Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageDesktopX3Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageMobileX1Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageMobileX2Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageMobileX3Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "navigationAction": 0,
+        "type": 1
+      },
+      {
+        "collectionId": 0,
+        "url": "/live/sk-sigma-olomouc-fsv-mainz-05/81664400/",
+        "seoUrl": "/live/sk-sigma-olomouc-fsv-mainz-05/81664400/",
+        "moreButtonUrl": "/live/sk-sigma-olomouc-fsv-mainz-05/81664400?ms=MRES&msname=Match+Result",
+        "teams": [
+          "SK Sigma Olomouc",
+          "FSV Mainz 05"
+        ],
+        "eventId": "81664400",
+        "sportId": "FOOT",
+        "isLiveNow": true,
+        "liveData": {
+          "score": {
+            "home": "0",
+            "away": "0"
+          },
+          "clock": {
+            "secondsSinceStart": 4230
+          },
+          "results": {
+            "goal": {
+              "home": "0",
+              "away": "0"
+            },
+            "standardTimeScore": {
+              "home": "0",
+              "away": "0"
+            },
+            "extraTimeScore": {
+              "home": "-",
+              "away": "-"
+            },
+            "shootoutScore": {
+              "home": "-",
+              "away": "-"
+            },
+            "penaltyShootout": {
+              "home": [],
+              "away": []
+            },
+            "penalties": {
+              "home": "0",
+              "away": "0"
+            },
+            "yellow": {
+              "home": "1",
+              "away": "0"
+            },
+            "corners": {
+              "home": "0",
+              "away": "1"
+            },
+            "injuryTime": 0
+          },
+          "periodDescription": ""
+        },
+        "market": {
+          "id": "2636706862",
+          "name": "Match Result",
+          "type": "MRES",
+          "typeId": 1,
+          "handicap": 0.0,
+          "marketCloseTimeMillis": 1773345600000,
+          "renderingLayout": 4,
+          "selections": [
+            {
+              "id": "9112608233",
+              "name": "1",
+              "fullName": "SK Sigma Olomouc",
+              "price": 7.2,
+              "handicap": 0.0,
+              "betRef": "9112608233",
+              "renderingLayout": 4,
+              "columnIndex": 0
+            },
+            {
+              "id": "9112608234",
+              "name": "X",
+              "fullName": "Draw",
+              "price": 1.65,
+              "handicap": 0.0,
+              "betRef": "9112608234",
+              "renderingLayout": 4,
+              "columnIndex": 1
+            },
+            {
+              "id": "9112608235",
+              "name": "2",
+              "fullName": "FSV Mainz 05",
+              "price": 3.15,
+              "handicap": 0.0,
+              "betRef": "9112608235",
+              "renderingLayout": 4,
+              "columnIndex": 2
+            }
+          ],
+          "scorerSelections": [],
+          "exactScoreSelections": []
+        },
+        "eventImage": "https://assets.gmlinteractive.com/2026/03/Mainz-imago-2026-180x200.jpg",
+        "eventImageStandard": "https://assets.gmlinteractive.com/2026/03/Mainz-imago-2026-540x600.webp",
+        "eventImageRetina": "https://assets.gmlinteractive.com/2026/03/Mainz-imago-2026-720x800.webp",
+        "eventImageDesktopX1Webp": "https://assets.gmlinteractive.com/2026/03/Mainz-imago-2026-180x200.webp",
+        "eventImageDesktopX2Webp": "https://assets.gmlinteractive.com/2026/03/Mainz-imago-2026-360x400.webp",
+        "eventImageDesktopX3Webp": "https://assets.gmlinteractive.com/2026/03/Mainz-imago-2026-480x600.webp",
+        "eventImageMobileX1Webp": "https://assets.gmlinteractive.com/2026/03/Mainz-imago-2026-144x160.webp",
+        "eventImageMobileX2Webp": "https://assets.gmlinteractive.com/2026/03/Mainz-imago-2026-288x320.webp",
+        "eventImageMobileX3Webp": "https://assets.gmlinteractive.com/2026/03/Mainz-imago-2026-432x480.webp",
+        "themeImage": "https://assets.gmlinteractive.com/2025/08/8ef6ccf7e5ec_1426420.webp",
+        "themeImageDesktopX1Webp": "https://assets.gmlinteractive.com/2025/08/8ef6ccf7e5ec_1426420.webp",
+        "themeImageDesktopX2Webp": "https://assets.gmlinteractive.com/2025/08/8ef6ccf7e5ec_1426420.webp",
+        "themeImageDesktopX3Webp": "https://assets.gmlinteractive.com/2025/08/8ef6ccf7e5ec_1426420.webp",
+        "themeImageMobileX1Webp": "https://assets.gmlinteractive.com/2025/08/8ef6ccf7e5ec_1426420.webp",
+        "themeImageMobileX2Webp": "https://assets.gmlinteractive.com/2025/08/8ef6ccf7e5ec_1426420.webp",
+        "themeImageMobileX3Webp": "https://assets.gmlinteractive.com/2025/08/8ef6ccf7e5ec_1426420.webp",
+        "navigationAction": 0,
+        "type": 1
+      },
+      {
+        "collectionId": 0,
+        "url": "/live/ferencvarosi-tc-sc-braga/81661931/",
+        "seoUrl": "/live/ferencvarosi-tc-sc-braga/81661931/",
+        "moreButtonUrl": "/live/ferencvarosi-tc-sc-braga/81661931?ms=MRES&msname=Match+Result",
+        "teams": [
+          "Ferencvarosi TC",
+          "SC Braga"
+        ],
+        "eventId": "81661931",
+        "sportId": "FOOT",
+        "isLiveNow": true,
+        "liveData": {
+          "score": {
+            "home": "2",
+            "away": "0"
+          },
+          "clock": {
+            "secondsSinceStart": 4236
+          },
+          "results": {
+            "goal": {
+              "home": "2",
+              "away": "0"
+            },
+            "standardTimeScore": {
+              "home": "2",
+              "away": "0"
+            },
+            "extraTimeScore": {
+              "home": "-",
+              "away": "-"
+            },
+            "shootoutScore": {
+              "home": "-",
+              "away": "-"
+            },
+            "penaltyShootout": {
+              "home": [],
+              "away": []
+            },
+            "penalties": {
+              "home": "0",
+              "away": "0"
+            },
+            "yellow": {
+              "home": "1",
+              "away": "1"
+            },
+            "corners": {
+              "home": "2",
+              "away": "6"
+            },
+            "scorers": [
+              {
+                "goalsDescription": "32' Gabi Kanichowsky",
+                "homeAway": "home"
+              },
+              {
+                "goalsDescription": "69' L. Joseph",
+                "homeAway": "home"
+              }
+            ],
+            "injuryTime": 0
+          },
+          "periodDescription": ""
+        },
+        "market": {
+          "id": "2636638068",
+          "name": "Match Result",
+          "type": "MRES",
+          "typeId": 1,
+          "handicap": 0.0,
+          "marketCloseTimeMillis": 1773345600000,
+          "renderingLayout": 4,
+          "selections": [
+            {
+              "id": "9112332387",
+              "name": "1",
+              "fullName": "Ferencvarosi TC",
+              "price": 1.04,
+              "handicap": 0.0,
+              "betRef": "9112332387",
+              "renderingLayout": 4,
+              "columnIndex": 0
+            },
+            {
+              "id": "9112332388",
+              "name": "X",
+              "fullName": "Draw",
+              "price": 12.5,
+              "handicap": 0.0,
+              "betRef": "9112332388",
+              "renderingLayout": 4,
+              "columnIndex": 1
+            },
+            {
+              "id": "9112332389",
+              "name": "2",
+              "fullName": "SC Braga",
+              "price": 60.0,
+              "handicap": 0.0,
+              "betRef": "9112332389",
+              "renderingLayout": 4,
+              "columnIndex": 2
+            }
+          ],
+          "scorerSelections": [],
+          "exactScoreSelections": []
+        },
+        "eventImage": "https://assets.gmlinteractive.com/2026/02/Braga-imago-2026-3-180x200.webp",
+        "eventImageStandard": "https://assets.gmlinteractive.com/2026/02/Braga-imago-2026-3-540x600.webp",
+        "eventImageRetina": "https://assets.gmlinteractive.com/2026/02/Braga-imago-2026-3-720x800.webp",
+        "eventImageDesktopX1Webp": "https://assets.gmlinteractive.com/2026/02/Braga-imago-2026-3-180x200.webp",
+        "eventImageDesktopX2Webp": "https://assets.gmlinteractive.com/2026/02/Braga-imago-2026-3-360x400.webp",
+        "eventImageDesktopX3Webp": "https://assets.gmlinteractive.com/2026/02/Braga-imago-2026-3-480x600.webp",
+        "eventImageMobileX1Webp": "https://assets.gmlinteractive.com/2026/02/Braga-imago-2026-3-144x160.webp",
+        "eventImageMobileX2Webp": "https://assets.gmlinteractive.com/2026/02/Braga-imago-2026-3-288x320.webp",
+        "eventImageMobileX3Webp": "https://assets.gmlinteractive.com/2026/02/Braga-imago-2026-3-432x480.webp",
+        "themeImage": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageDesktopX1Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageDesktopX2Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageDesktopX3Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageMobileX1Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageMobileX2Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "themeImageMobileX3Webp": "https://assets.gmlinteractive.com/2025/07/c2c9421f348d_1426376.webp",
+        "navigationAction": 0,
+        "type": 1
+      }
+    ],
+    "pollingIntervalTime": 2
+  }
+}
