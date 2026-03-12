@@ -6,6 +6,8 @@ Available bookmakers:
 - BetkingAltenar: Betking via Altenar API, no browser needed
 - Nairabet: Legacy (API dead)
 - NairabetAltenar: Nairabet via Altenar API
+- TwentyTwoBet: 22bet.ng via 1xBet API
+- Surebet247: Surebet247 via direct WebSocket (no browser needed)
 """
 
 from .bet9ja import Bet9ja
@@ -15,11 +17,22 @@ from .nairabet_altenar import NairabetAltenar
 from .betking_altenar import BetkingAltenar
 from .twentytwobet import TwentyTwoBet
 
-# Playwright version (optional - only if playwright installed)
+# Surebet247 (optional - only if websockets + msgpack installed)
+try:
+    from .surebet247 import Surebet247
+except ImportError:
+    pass
+
+# Playwright versions (optional - only if playwright installed)
 try:
     from .betking_playwright import BetkingPlaywright
-    __all__ = ['Bet9ja', 'Betking', 'Nairabet', 'BetkingPlaywright',
-               'NairabetAltenar', 'BetkingAltenar', 'TwentyTwoBet']
 except ImportError:
-    __all__ = ['Bet9ja', 'Betking', 'Nairabet',
-               'NairabetAltenar', 'BetkingAltenar', 'TwentyTwoBet']
+    pass
+
+__all__ = ['Bet9ja', 'Betking', 'Nairabet', 'NairabetAltenar',
+           'BetkingAltenar', 'TwentyTwoBet']
+
+# Add optional exports if available
+for _name in ('Surebet247', 'BetkingPlaywright'):
+    if _name in dir():
+        __all__.append(_name)
