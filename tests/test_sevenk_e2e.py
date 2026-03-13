@@ -104,17 +104,30 @@ class TestSevenKBetDetail:
             assert isinstance(match_data[field], (int, float))
             assert match_data[field] > 1.0
 
+    def test_corners_odds(self, match_data):
+        corner_keys = [k for k in match_data if k.startswith("corners_")]
+        assert len(corner_keys) >= 2, f"Expected corners odds, got {corner_keys}"
+        over_keys = [k for k in corner_keys if "over" in k]
+        under_keys = [k for k in corner_keys if "under" in k]
+        assert len(over_keys) >= 1, "No corners over lines found"
+        assert len(under_keys) >= 1, "No corners under lines found"
+        for k in corner_keys:
+            assert isinstance(match_data[k], (int, float)), f"{k} not numeric"
+            assert match_data[k] > 1.0, f"{k}={match_data[k]} should be > 1.0"
+
     def test_all_odds_summary(self, match_data):
         """Print summary for manual verification."""
         all_odds = ODDS_1X2 + ODDS_DC + ODDS_OU + ODDS_BTTS
         present = [f for f in all_odds if f in match_data]
         missing = [f for f in all_odds if f not in match_data]
         ou_keys = sorted([k for k in match_data if k.startswith("over_") or k.startswith("under_")])
+        corner_keys = sorted([k for k in match_data if k.startswith("corners_")])
         print(f"\n  Match: {match_data['match']}")
         print(f"  1X2: H={match_data.get('home')} D={match_data.get('draw')} A={match_data.get('away')}")
         print(f"  DC: {match_data.get('home_or_draw')} / {match_data.get('home_or_away')} / {match_data.get('draw_or_away')}")
         print(f"  BTTS: Y={match_data.get('btts_yes')} N={match_data.get('btts_no')}")
         print(f"  O/U lines ({len(ou_keys)}): {ou_keys}")
+        print(f"  Corners lines ({len(corner_keys)}): {corner_keys}")
         print(f"  Present: {present}")
         print(f"  Missing: {missing}")
         assert len(missing) == 0, f"Missing odds fields: {missing}"

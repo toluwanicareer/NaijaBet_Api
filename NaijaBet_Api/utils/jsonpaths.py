@@ -173,6 +173,10 @@ def merge_bet9ja_markets(main_results, *extra_results_list):
                 # Merge non-None fields (skip match_id itself)
                 for key, value in extra.items():
                     if key != 'match_id' and value is not None:
+                        try:
+                            value = float(value)
+                        except (ValueError, TypeError):
+                            pass
                         main_by_id[mid][key] = value
 
     return main_results

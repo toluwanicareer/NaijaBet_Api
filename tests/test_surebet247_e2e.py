@@ -79,17 +79,35 @@ class TestSurebet247Detail:
             assert isinstance(match_data[field], (int, float))
             assert match_data[field] > 1.0
 
+    @pytest.fixture(scope="class")
+    def league_data(self):
+        with Surebet247() as sb:
+            return sb.get_league(Betid.PREMIERLEAGUE)
+
+    def test_corners_odds(self, league_data):
+        """At least one match in the league should have corners odds."""
+        for match in league_data:
+            corner_keys = [k for k in match if k.startswith("corners_")]
+            if corner_keys:
+                for k in corner_keys:
+                    assert isinstance(match[k], (int, float)), f"{k} not numeric"
+                    assert match[k] > 1.0, f"{k}={match[k]} should be > 1.0"
+                return
+        pytest.fail(f"No match in {len(league_data)} results has corners odds")
+
     def test_all_odds_summary(self, match_data):
         """Print summary for manual verification."""
         all_odds = ODDS_1X2 + ODDS_DC + ODDS_OU + ODDS_BTTS
         present = [f for f in all_odds if f in match_data]
         missing = [f for f in all_odds if f not in match_data]
         ou_keys = sorted([k for k in match_data if k.startswith("over_") or k.startswith("under_")])
+        corner_keys = sorted([k for k in match_data if k.startswith("corners_")])
         print(f"\n  Match: {match_data['match']}")
         print(f"  1X2: H={match_data.get('home')} D={match_data.get('draw')} A={match_data.get('away')}")
         print(f"  DC: {match_data.get('home_or_draw')} / {match_data.get('home_or_away')} / {match_data.get('draw_or_away')}")
         print(f"  BTTS: Y={match_data.get('btts_yes')} N={match_data.get('btts_no')}")
         print(f"  O/U lines ({len(ou_keys)}): {ou_keys}")
+        print(f"  Corners lines ({len(corner_keys)}): {corner_keys}")
         print(f"  Present: {present}")
         print(f"  Missing: {missing}")
         assert len(missing) == 0, f"Missing odds fields: {missing}"
