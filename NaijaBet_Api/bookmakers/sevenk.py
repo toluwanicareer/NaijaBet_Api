@@ -108,17 +108,56 @@ LEAGUE_MAP = {
 }
 
 # Target market type codes → market names in the event page response
-_TARGET_MARKETS = {"FT 1X2", "Double Chance", "Total Goals O/U", "Both Teams To Score"}
+_TARGET_MARKETS = {
+    "FT 1X2", "Double Chance", "Total Goals O/U", "Both Teams To Score",
+    "Corners FT O/U", "Corners FT Asian Handicap", "FT Asian Handicap",
+}
 
 
 def _extract_odds(markets: list) -> Dict[str, Any]:
     """Extract standardized odds from an event page market array."""
     odds = {}
+    # Collect Asian handicap candidates to pick the main line afterwards.
+    # Each entry: (abs_line, line_value, home_odds, away_odds)
+    ah_candidates: list = []
+    corners_ah_candidates: list = []
+
     for m in markets:
         mname = m[1]
         if mname not in _TARGET_MARKETS:
             continue
         selections = m[13]
+
+        # --- Asian handicap markets need pair collection first ---
+        if mname in ("FT Asian Handicap", "Corners FT Asian Handicap"):
+            # Group selections into (home, away) pairs by absolute line value.
+            # sel[9]==1 → home, sel[9]==3 → away; sel[16] → line
+            pairs: Dict[float, Dict[str, float]] = {}
+            for sel in selections:
+                dec_odds = sel[6]
+                suspended = sel[5]
+                if suspended or not isinstance(dec_odds, (int, float)) or dec_odds <= 0:
+                    continue
+                line = sel[16]
+                pos = sel[9]
+                if line is None:
+                    continue
+                abs_line = abs(line)
+                if abs_line not in pairs:
+                    pairs[abs_line] = {}
+                if pos == 1:
+                    pairs[abs_line]["home"] = dec_odds
+                    pairs[abs_line]["home_line"] = line
+                elif pos == 3:
+                    pairs[abs_line]["away"] = dec_odds
+                    pairs[abs_line]["away_line"] = line
+            # Keep only complete pairs (both home and away present)
+            target = corners_ah_candidates if mname == "Corners FT Asian Handicap" else ah_candidates
+            for abs_line, pair in pairs.items():
+                if "home" in pair and "away" in pair:
+                    target.append((abs_line, pair["home_line"], pair["home"], pair["away"]))
+            continue
+
         for sel in selections:
             dec_odds = sel[6]
             suspended = sel[5]
@@ -164,6 +203,34 @@ def _extract_odds(markets: list) -> Dict[str, Any]:
                     odds[f"over_{line_key}"] = dec_odds
                 elif "Under" in str(direction):
                     odds[f"under_{line_key}"] = dec_odds
+
+            elif mname == "Corners FT O/U":
+                line = sel[16]
+                direction = sel[2]
+                if isinstance(direction, dict):
+                    direction = direction.get("EN", "")
+                if line is None:
+                    continue
+                line_key = str(line).replace(".", "_")
+                if "Over" in str(direction):
+                    odds[f"corners_over_{line_key}"] = dec_odds
+                elif "Under" in str(direction):
+                    odds[f"corners_under_{line_key}"] = dec_odds
+
+    # Pick main Asian handicap line (smallest absolute line with active odds)
+    if ah_candidates:
+        ah_candidates.sort(key=lambda x: x[0])
+        _, home_line, home_odds, away_odds = ah_candidates[0]
+        odds["asian_handicap_1"] = home_odds
+        odds["asian_handicap_2"] = away_odds
+        odds["asian_handicap_line"] = home_line
+
+    if corners_ah_candidates:
+        corners_ah_candidates.sort(key=lambda x: x[0])
+        _, home_line, home_odds, away_odds = corners_ah_candidates[0]
+        odds["corners_asian_handicap_1"] = home_odds
+        odds["corners_asian_handicap_2"] = away_odds
+        odds["corners_asian_handicap_line"] = home_line
 
     return odds
 

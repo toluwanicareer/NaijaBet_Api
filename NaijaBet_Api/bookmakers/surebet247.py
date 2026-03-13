@@ -154,7 +154,11 @@ _OUTCOME_MAP = {
     (3, 10): "home_or_draw", (3, 8): "home_or_away", (3, 9): "draw_or_away",
     (28, 14): "btts_yes", (28, 15): "btts_no",
     (5, 4): "over", (5, 5): "under",
+    (4, 86): "asian_handicap_1", (4, 87): "asian_handicap_2",   # Asian Handicap
 }
+
+# Period 66 = Corners in the GR8 Tech feed
+_CORNERS_PERIOD = 66
 
 # --- SignalR MessagePack protocol helpers ---
 
@@ -246,7 +250,12 @@ def _parse_markets(markets_data):
             if not isinstance(header, list) or len(header) < 4:
                 continue
             ev_id, period, mtype, sub = header[0], header[1], header[2], header[3]
-            if period != 1 or sub != 0 or mtype not in (2, 3, 5, 28):
+            # Accept:
+            #   period=1, sub=0: 1X2(2), DC(3), O/U goals(5), BTTS(28), Asian HC(4)
+            #   period=66, sub=0: Corners O/U(5)
+            is_standard = period == 1 and sub == 0 and mtype in (2, 3, 4, 5, 28)
+            is_corners = period == _CORNERS_PERIOD and sub == 0 and mtype == 5
+            if not (is_standard or is_corners):
                 continue
             if ev_id not in odds:
                 odds[ev_id] = {}
@@ -280,13 +289,65 @@ def _parse_markets(markets_data):
                     key = (mtype, oid)
                     if key in _OUTCOME_MAP:
                         name = _OUTCOME_MAP[key]
-                        if mtype == 5 and line_val is not None:
+                        if is_corners and mtype == 5 and line_val is not None:
+                            # Corners O/U: corners_over_8_5, corners_under_8_5
+                            line_key = str(line_val).replace(".", "_")
+                            field = f"corners_{name}_{line_key}"
+                        elif mtype == 5 and line_val is not None:
+                            # Goals O/U: over_2_5, under_2_5
+                            line_key = str(line_val).replace(".", "_")
+                            field = f"{name}_{line_key}"
+                        elif mtype == 4 and line_val is not None:
+                            # Asian Handicap: asian_handicap_1_-0_5 etc.
                             line_key = str(line_val).replace(".", "_")
                             field = f"{name}_{line_key}"
                         else:
                             field = name
                         odds[ev_id][field] = odds_val
+
+    # Post-process: pick best Asian Handicap line per event
+    for ev_id in odds:
+        _pick_asian_handicap_line(odds[ev_id])
+
     return odds
+
+
+def _pick_asian_handicap_line(ev_odds):
+    """Post-process Asian Handicap: pick the line closest to 0 for the
+    convenience fields asian_handicap_1, asian_handicap_2, asian_handicap_line.
+
+    Called once per event after all markets have been parsed.
+    Reads the per-line fields (asian_handicap_1_X, asian_handicap_2_X)
+    and selects the pair whose absolute line value is smallest.
+    """
+    best_line = None
+    best_abs = None
+    # Scan for all stored AH lines
+    for key in list(ev_odds.keys()):
+        if not key.startswith("asian_handicap_1_"):
+            continue
+        line_key = key[len("asian_handicap_1_"):]
+        away_key = f"asian_handicap_2_{line_key}"
+        if away_key not in ev_odds:
+            continue
+        # Reconstruct the numeric line from the key (e.g. "-1_5" -> -1.5)
+        line_str = line_key.replace("_", ".", 1)
+        # Handle negative lines like "-1_5" -> already "-1.5"
+        # Handle keys like "0" -> "0"
+        try:
+            lv = float(line_str)
+        except (TypeError, ValueError):
+            continue
+        a = abs(lv)
+        if best_abs is None or a < best_abs:
+            best_abs = a
+            best_line = line_key
+
+    if best_line is not None:
+        line_str = best_line.replace("_", ".", 1)
+        ev_odds["asian_handicap_1"] = ev_odds[f"asian_handicap_1_{best_line}"]
+        ev_odds["asian_handicap_2"] = ev_odds[f"asian_handicap_2_{best_line}"]
+        ev_odds["asian_handicap_line"] = line_str
 
 
 def _parse_main_markets(markets_data):
@@ -479,7 +540,7 @@ class Surebet247:
         )
 
     async def _get_full_markets(self, event_ids):
-        """Fetch full markets (1X2, DC, O/U, BTTS) for event IDs."""
+        """Fetch full markets (1X2, DC, O/U, BTTS, Asian HC, Corners) for event IDs."""
         all_odds = {}
         BATCH = 50
         for i in range(0, len(event_ids), BATCH):
@@ -502,7 +563,7 @@ class Surebet247:
 
     def get_league(self, league: Betid = Betid.PREMIERLEAGUE) -> List[Dict[str, Any]]:
         """
-        Fetch full odds for a league (1X2, DC, O/U, BTTS).
+        Fetch full odds for a league (1X2, DC, O/U, BTTS, Asian HC, Corners).
 
         Args:
             league: League to fetch (from Betid enum)

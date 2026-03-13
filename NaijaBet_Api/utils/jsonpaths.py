@@ -32,6 +32,60 @@ bet9ja_search_string = ('D.E[*].{"match": DS, '
                         '"btts_no": O.S_GGNG_N '
                         '}')
 
+# Bet9ja corners over/under (GROUPMARKETID=216 "Main Corner")
+bet9ja_corners_search_string = ('D.E[*].{"match_id": ID, '
+                                '"corners_over_6_5": O."S_OUCORNERS@6.5_O", '
+                                '"corners_under_6_5": O."S_OUCORNERS@6.5_U", '
+                                '"corners_over_7_5": O."S_OUCORNERS@7.5_O", '
+                                '"corners_under_7_5": O."S_OUCORNERS@7.5_U", '
+                                '"corners_over_8_5": O."S_OUCORNERS@8.5_O", '
+                                '"corners_under_8_5": O."S_OUCORNERS@8.5_U", '
+                                '"corners_over_9_5": O."S_OUCORNERS@9.5_O", '
+                                '"corners_under_9_5": O."S_OUCORNERS@9.5_U", '
+                                '"corners_over_10_5": O."S_OUCORNERS@10.5_O", '
+                                '"corners_under_10_5": O."S_OUCORNERS@10.5_U", '
+                                '"corners_over_11_5": O."S_OUCORNERS@11.5_O", '
+                                '"corners_under_11_5": O."S_OUCORNERS@11.5_U", '
+                                '"corners_over_12_5": O."S_OUCORNERS@12.5_O", '
+                                '"corners_under_12_5": O."S_OUCORNERS@12.5_U", '
+                                '"corners_over_13_5": O."S_OUCORNERS@13.5_O", '
+                                '"corners_under_13_5": O."S_OUCORNERS@13.5_U" '
+                                '}')
+
+# Bet9ja Asian handicap (GROUPMARKETID=S_AH "Asian Handicap")
+bet9ja_asian_handicap_search_string = ('D.E[*].{"match_id": ID, '
+                                       '"ah_minus_2_5_1": O."S_AH@-2.5_1", '
+                                       '"ah_minus_2_5_2": O."S_AH@-2.5_2", '
+                                       '"ah_minus_2_1": O."S_AH@-2_1", '
+                                       '"ah_minus_2_2": O."S_AH@-2_2", '
+                                       '"ah_minus_1_5_1": O."S_AH@-1.5_1", '
+                                       '"ah_minus_1_5_2": O."S_AH@-1.5_2", '
+                                       '"ah_minus_1_1": O."S_AH@-1_1", '
+                                       '"ah_minus_1_2": O."S_AH@-1_2", '
+                                       '"ah_minus_0_75_1": O."S_AH@-0.75_1", '
+                                       '"ah_minus_0_75_2": O."S_AH@-0.75_2", '
+                                       '"ah_minus_0_5_1": O."S_AH@-0.5_1", '
+                                       '"ah_minus_0_5_2": O."S_AH@-0.5_2", '
+                                       '"ah_minus_0_25_1": O."S_AH@-0.25_1", '
+                                       '"ah_minus_0_25_2": O."S_AH@-0.25_2", '
+                                       '"ah_0_1": O."S_AH@0_1", '
+                                       '"ah_0_2": O."S_AH@0_2", '
+                                       '"ah_plus_0_25_1": O."S_AH@0.25_1", '
+                                       '"ah_plus_0_25_2": O."S_AH@0.25_2", '
+                                       '"ah_plus_0_5_1": O."S_AH@0.5_1", '
+                                       '"ah_plus_0_5_2": O."S_AH@0.5_2", '
+                                       '"ah_plus_0_75_1": O."S_AH@0.75_1", '
+                                       '"ah_plus_0_75_2": O."S_AH@0.75_2", '
+                                       '"ah_plus_1_1": O."S_AH@1_1", '
+                                       '"ah_plus_1_2": O."S_AH@1_2", '
+                                       '"ah_plus_1_5_1": O."S_AH@1.5_1", '
+                                       '"ah_plus_1_5_2": O."S_AH@1.5_2", '
+                                       '"ah_plus_2_1": O."S_AH@2_1", '
+                                       '"ah_plus_2_2": O."S_AH@2_2", '
+                                       '"ah_plus_2_5_1": O."S_AH@2.5_1", '
+                                       '"ah_plus_2_5_2": O."S_AH@2.5_2" '
+                                       '}')
+
 betking_search_string = ('AreaMatches[0].Items[*].{"match": ItemName, '
                          '"league": TournamentName, '
                          '"time": ItemDate, '
@@ -90,6 +144,35 @@ def validator(json, search_string) -> Sequence[Mapping[Any, Any]]:
 
 
 bet9ja_validator = partial(validator, search_string=bet9ja_search_string)
+bet9ja_corners_validator = partial(validator, search_string=bet9ja_corners_search_string)
+bet9ja_asian_handicap_validator = partial(validator, search_string=bet9ja_asian_handicap_search_string)
 betking_validator = partial(validator, search_string=betking_search_string)
 nairabet_validator = partial(validator, search_string=nairabet_search_string)
 nairabet_league_validator = partial(validator, search_string=nairabet_league_search_string)
+
+
+def merge_bet9ja_markets(main_results, *extra_results_list):
+    """Merge extra market data (corners, Asian handicap) into main results by match_id.
+
+    Each extra_results list contains dicts with 'match_id' plus market-specific fields.
+    Fields with None values from extra results are excluded from the merge.
+    Events in main_results that have no corresponding extra data are left unchanged.
+    """
+    if not main_results:
+        return main_results
+
+    # Index main results by match_id for O(1) lookup
+    main_by_id = {match['match_id']: match for match in main_results if match.get('match_id')}
+
+    for extra_results in extra_results_list:
+        if not extra_results:
+            continue
+        for extra in extra_results:
+            mid = extra.get('match_id')
+            if mid and mid in main_by_id:
+                # Merge non-None fields (skip match_id itself)
+                for key, value in extra.items():
+                    if key != 'match_id' and value is not None:
+                        main_by_id[mid][key] = value
+
+    return main_results

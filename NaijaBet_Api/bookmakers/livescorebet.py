@@ -9,6 +9,7 @@ Usage:
     data = lsb.get_league(Betid.PREMIERLEAGUE)
 """
 
+import re
 import uuid
 import requests
 import arrow
@@ -18,6 +19,12 @@ from typing import List, Dict, Any, Optional
 
 _BASE = "https://gateway-ng.livescorebet.com/sportsbook/gateway"
 _EVENTS_URL = _BASE + "/v3/view/events/matches"
+
+# Kambi CDN betoffer endpoint — returns ALL markets for a single event.
+# The gateway-ng matches endpoint only serves core markets (1X2, DC, BTTS, O/U).
+# Extended markets (corners, Asian handicap) require the CDN betoffer endpoint.
+_KAMBI_CDN = "https://eu-offering-api.kambicdn.com/offering/v2018"
+_BETOFFER_URL = _KAMBI_CDN + "/livescorebet/betoffer/event/{event_id}.json"
 
 # Betid -> SBTC3 category ID
 COMPETITION_MAP = {
@@ -159,6 +166,69 @@ COMPETITION_MAP = {
 }
 
 
+def _parse_betoffers(data):
+    """Extract corners O/U and Asian handicap from Kambi CDN betoffer response.
+
+    The CDN ``/betoffer/event/{id}.json`` endpoint returns *all* markets for an
+    event.  Each betOffer has:
+      - ``criterion.label`` — market name (e.g. "Total Corners", "Asian Handicap")
+      - ``criterion.lifetime`` — period (e.g. "FULL_TIME")
+      - ``betOfferType.name`` — type (e.g. "Over/Under", "Asian Handicap")
+      - ``outcomes`` — list with ``label``, ``odds`` (int, millis), ``line``
+        (int, millis), and optionally ``participant``.
+
+    Returns a dict of extracted fields ready to merge into a match dict.
+    """
+    result = {}
+    betoffers = data.get("betOffers", [])
+
+    for bo in betoffers:
+        criterion = bo.get("criterion", {})
+        label = criterion.get("label", "")
+        lifetime = criterion.get("lifetime", "")
+        outcomes = bo.get("outcomes", [])
+
+        # --- Total Corners (Full Time) — Over/Under lines ---
+        if label == "Total Corners" and lifetime == "FULL_TIME":
+            for outcome in outcomes:
+                otype = outcome.get("type", "")
+                odds_millis = outcome.get("odds")
+                line_millis = outcome.get("line")
+                if odds_millis is None or line_millis is None:
+                    continue
+                odds_val = odds_millis / 1000
+                # line_millis 10500 -> "10_5", 8500 -> "8_5"
+                line_val = line_millis / 1000
+                line_str = str(line_val).replace(".", "_")
+                if otype == "OT_OVER":
+                    result[f"corners_over_{line_str}"] = odds_val
+                elif otype == "OT_UNDER":
+                    result[f"corners_under_{line_str}"] = odds_val
+
+        # --- Asian Handicap (Full Time) ---
+        # Each betoffer is one handicap line with 2 outcomes (home / away).
+        # ``line`` is in millis: -250 → -0.25, 750 → 0.75, etc.
+        # Home is always listed first in outcomes.
+        elif label == "Asian Handicap" and lifetime == "FULL_TIME":
+            if len(outcomes) < 2:
+                continue
+            home_out = outcomes[0]
+            away_out = outcomes[1]
+            home_odds = home_out.get("odds")
+            away_odds = away_out.get("odds")
+            home_line = home_out.get("line")
+            if home_odds is None or away_odds is None or home_line is None:
+                continue
+            handicap_line = home_line / 1000  # e.g. 750 -> 0.75
+            # Store every line: asian_handicap_1_+0_75 / asian_handicap_2_+0_75
+            sign = "+" if handicap_line >= 0 else ""
+            line_tag = f"{sign}{handicap_line}".replace(".", "_")
+            result[f"asian_handicap_1_{line_tag}"] = home_odds / 1000
+            result[f"asian_handicap_2_{line_tag}"] = away_odds / 1000
+
+    return result
+
+
 def _parse_events(data):
     """Parse LivescoreBet events+markets response into standardized dicts."""
     results = []
@@ -267,6 +337,37 @@ def _parse_events(data):
                             if direction in ("over", "under"):
                                 match_dict[f"{direction}_{line}"] = float(odds)
 
+                elif name == "Total Corners" and period == "FT":
+                    for sel in selections:
+                        sel_name = sel.get("name", "")
+                        odds = sel.get("odds")
+                        if odds is None:
+                            continue
+                        parts = sel_name.split()
+                        if len(parts) == 2:
+                            direction = parts[0].lower()
+                            line = parts[1].replace(".", "_")
+                            if direction in ("over", "under"):
+                                match_dict[f"corners_{direction}_{line}"] = float(odds)
+
+                elif name == "Asian Handicap" and period == "FT":
+                    if len(selections) >= 2:
+                        home_sel = selections[0]
+                        away_sel = selections[1]
+                        h_odds = home_sel.get("odds")
+                        a_odds = away_sel.get("odds")
+                        h_name = home_sel.get("name", "")
+                        if h_odds is not None and a_odds is not None:
+                            # Extract handicap line from selection name
+                            # e.g. "Arsenal (+0.75)" -> "+0_75"
+                            m = re.search(r'([+-]?\d+\.?\d*)', h_name)
+                            if m:
+                                line_val = float(m.group(1))
+                                sign = "+" if line_val >= 0 else ""
+                                tag = f"{sign}{line_val}".replace(".", "_")
+                                match_dict[f"asian_handicap_1_{tag}"] = float(h_odds)
+                                match_dict[f"asian_handicap_2_{tag}"] = float(a_odds)
+
             results.append(match_dict)
 
     return results
@@ -279,6 +380,10 @@ class LivescoreBet:
     Usage:
         lsb = LivescoreBet()
         data = lsb.get_league(Betid.PREMIERLEAGUE)
+
+    Extended markets (corners O/U, Asian handicap) are fetched from the
+    Kambi CDN betoffer endpoint per event.  Pass ``extended=False`` to
+    ``get_league`` to skip the extra requests.
     """
 
     _headers = {
@@ -294,7 +399,38 @@ class LivescoreBet:
         if proxies:
             self.session.proxies = proxies
 
-    def get_league(self, league: Betid = Betid.PREMIERLEAGUE) -> List[Dict[str, Any]]:
+    # ------------------------------------------------------------------
+    # Internal: fetch extended markets from Kambi CDN
+    # ------------------------------------------------------------------
+
+    def _fetch_event_betoffers(self, event_id: int) -> Dict[str, Any]:
+        """Fetch all betoffers for *event_id* from the Kambi CDN.
+
+        Returns a dict of extra fields (corners, Asian handicap) to merge
+        into the match dict, or an empty dict on failure.
+        """
+        url = _BETOFFER_URL.format(event_id=event_id)
+        try:
+            res = self.session.get(
+                url,
+                params={"lang": "en_GB", "market": "NG"},
+                timeout=10,
+            )
+            if res.status_code != 200:
+                return {}
+            return _parse_betoffers(res.json())
+        except Exception:
+            return {}
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    def get_league(
+        self,
+        league: Betid = Betid.PREMIERLEAGUE,
+        extended: bool = True,
+    ) -> List[Dict[str, Any]]:
         cat_id = COMPETITION_MAP.get(league)
         if not cat_id:
             return []
@@ -307,16 +443,31 @@ class LivescoreBet:
             )
             if res.status_code != 200:
                 return []
-            return _parse_events(res.json())
+            matches = _parse_events(res.json())
         except Exception:
             return []
 
-    def get_all(self) -> List[Dict[str, Any]]:
+        if extended:
+            for match_dict in matches:
+                event_id = match_dict.get("match_id")
+                if not event_id:
+                    continue
+                # Skip CDN call if gateway already provided corners/handicap
+                has_corners = any(k.startswith("corners_") for k in match_dict)
+                has_ah = any(k.startswith("asian_handicap_") for k in match_dict)
+                if has_corners and has_ah:
+                    continue
+                extra = self._fetch_event_betoffers(event_id)
+                match_dict.update(extra)
+
+        return matches
+
+    def get_all(self, extended: bool = True) -> List[Dict[str, Any]]:
         self.data = []
         for league in COMPETITION_MAP:
-            self.data += self.get_league(league)
+            self.data += self.get_league(league, extended=extended)
         return self.data
 
-    def get_team(self, team: str) -> List[Dict[str, Any]]:
-        all_matches = self.get_all()
+    def get_team(self, team: str, extended: bool = True) -> List[Dict[str, Any]]:
+        all_matches = self.get_all(extended=extended)
         return [m for m in all_matches if team.lower() in m["match"].lower()]

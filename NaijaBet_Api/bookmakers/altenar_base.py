@@ -23,6 +23,19 @@ OVER_UNDER_TYPE_MAP = {
     13: "under_{line}",
 }
 
+# Asian Handicap odds typeId -> field name prefix
+# typeId 1714 = home team handicap, 1715 = away team handicap
+# These appear under market typeId=16 ("Handicap")
+ASIAN_HANDICAP_TYPE_MAP = {
+    1714: "asian_handicap_1",
+    1715: "asian_handicap_2",
+}
+
+# Market typeIds for context-dependent extraction
+_MARKET_TOTAL_GOALS = 18       # "Total" (goals over/under)
+_MARKET_TOTAL_CORNERS = 166    # "Total corners" (corners over/under)
+_MARKET_ASIAN_HANDICAP = 16    # "Handicap" (Asian handicap)
+
 _EVENT_DETAILS_URL = (
     "https://sb2frontend-altenar2.biahosted.com/api/widget/GetEventDetails"
     "?culture=en-GB&timezoneOffset=-60&integration={integration}"
@@ -73,7 +86,8 @@ class AltenarBaseClass(BookmakerBaseClass):
         """
         Fetch all odds for a single event from GetEventDetails.
 
-        Returns a dict of all available odds including all over/under lines.
+        Returns a dict of all available odds including all over/under lines,
+        corners over/under, and Asian handicap.
         """
         url = _EVENT_DETAILS_URL.format(
             integration=self._integration, event_id=event_id
@@ -90,13 +104,27 @@ class AltenarBaseClass(BookmakerBaseClass):
         odds_list = data.get("odds", [])
         odds_by_id = {o["id"]: o for o in odds_list}
 
-        # Collect oddIds from Total markets (typeId=18) for over/under extraction
+        # Collect oddIds from Total goals markets (typeId=18)
         total_odd_ids = set()
+        # Collect oddIds from Total corners markets (typeId=166)
+        corners_odd_ids = set()
+        # Collect oddIds from Asian Handicap markets (typeId=16)
+        handicap_odd_ids = set()
+
         for m in markets:
-            if m.get("typeId") == 18:
+            m_type = m.get("typeId")
+            if m_type == _MARKET_TOTAL_GOALS:
                 for row in m.get("desktopOddIds", []):
                     if isinstance(row, list):
                         total_odd_ids.update(row)
+            elif m_type == _MARKET_TOTAL_CORNERS:
+                for row in m.get("desktopOddIds", []):
+                    if isinstance(row, list):
+                        corners_odd_ids.update(row)
+            elif m_type == _MARKET_ASIAN_HANDICAP:
+                for row in m.get("desktopOddIds", []):
+                    if isinstance(row, list):
+                        handicap_odd_ids.update(row)
 
         odds_dict = {}
 
@@ -113,16 +141,44 @@ class AltenarBaseClass(BookmakerBaseClass):
                 odds_dict[field] = price
                 continue
 
-            # Over/Under from the Total market only
-            if odd["id"] in total_odd_ids:
-                sv = odd.get("sv", "")
-                if not sv:
-                    continue
+            odd_id = odd["id"]
+            sv = odd.get("sv", "")
+
+            # Over/Under goals from the Total market only
+            if odd_id in total_odd_ids and sv:
                 line_key = sv.replace(".", "_")
                 if type_id == 12:
                     odds_dict[f"over_{line_key}"] = price
                 elif type_id == 13:
                     odds_dict[f"under_{line_key}"] = price
+                continue
+
+            # Corners over/under from the Total corners market
+            if odd_id in corners_odd_ids and sv:
+                line_key = sv.replace(".", "_")
+                if type_id == 12:
+                    odds_dict[f"corners_over_{line_key}"] = price
+                elif type_id == 13:
+                    odds_dict[f"corners_under_{line_key}"] = price
+                continue
+
+            # Asian Handicap from the Handicap market
+            if odd_id in handicap_odd_ids and sv:
+                ah_field = ASIAN_HANDICAP_TYPE_MAP.get(type_id)
+                if ah_field:
+                    # sv is the line, e.g. "+0.5", "-1.5"
+                    # Normalize: remove leading '+', replace '.' with '_'
+                    line_raw = sv.lstrip("+")
+                    line_key = line_raw.replace(".", "_")
+                    field_name = f"{ah_field}_{line_key}"
+                    odds_dict[field_name] = price
+                    # Also store the line value for the primary (first) line
+                    # as the convenience fields asian_handicap_1, _2, _line
+                    if ah_field == "asian_handicap_1" and "asian_handicap_line" not in odds_dict:
+                        odds_dict["asian_handicap_line"] = sv
+                        odds_dict["asian_handicap_1"] = price
+                    elif ah_field == "asian_handicap_2" and "asian_handicap_2" not in odds_dict:
+                        odds_dict["asian_handicap_2"] = price
 
         return odds_dict
 
@@ -166,12 +222,38 @@ class AltenarBaseClass(BookmakerBaseClass):
                         match_odds[field] = odd.get("price")
                         continue
 
-                    # Over/Under from Total markets
-                    if market_type == 18:
+                    # Over/Under goals from Total markets
+                    if market_type == _MARKET_TOTAL_GOALS:
                         ou_field = OVER_UNDER_TYPE_MAP.get(type_id)
                         if ou_field:
                             line = market.get("sv", "").replace(".", "_")
                             match_odds[ou_field.format(line=line)] = odd.get("price")
+                        continue
+
+                    # Corners over/under from Total corners markets
+                    if market_type == _MARKET_TOTAL_CORNERS:
+                        sv = odd.get("sv", "")
+                        if sv:
+                            line_key = sv.replace(".", "_")
+                            if type_id == 12:
+                                match_odds[f"corners_over_{line_key}"] = odd.get("price")
+                            elif type_id == 13:
+                                match_odds[f"corners_under_{line_key}"] = odd.get("price")
+                        continue
+
+                    # Asian Handicap from Handicap markets
+                    if market_type == _MARKET_ASIAN_HANDICAP:
+                        ah_field = ASIAN_HANDICAP_TYPE_MAP.get(type_id)
+                        sv = odd.get("sv", "")
+                        if ah_field and sv:
+                            line_raw = sv.lstrip("+")
+                            line_key = line_raw.replace(".", "_")
+                            match_odds[f"{ah_field}_{line_key}"] = odd.get("price")
+                            if ah_field == "asian_handicap_1" and "asian_handicap_line" not in match_odds:
+                                match_odds["asian_handicap_line"] = sv
+                                match_odds["asian_handicap_1"] = odd.get("price")
+                            elif ah_field == "asian_handicap_2" and "asian_handicap_2" not in match_odds:
+                                match_odds["asian_handicap_2"] = odd.get("price")
 
             # Convert "Team A vs. Team B" to "Team A - Team B"
             name = event.get("name", "")

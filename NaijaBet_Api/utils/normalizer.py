@@ -47,6 +47,11 @@ def match_normalizer(list, pathstr: str):
                    'over_4_5', 'under_4_5', 'over_5_5', 'under_5_5',
                    'over_6_5', 'under_6_5', 'btts_yes', 'btts_no']
 
+    # Dynamic odds fields: corners_*, ah_*, asian_handicap_*
+    dynamic_prefixes = ('corners_over_', 'corners_under_',
+                        'ah_minus_', 'ah_plus_', 'ah_0_',
+                        'asian_handicap_1', 'asian_handicap_2')
+
     for event in data:
         teams = event.get("match", None)
         if teams is not None:
@@ -66,6 +71,15 @@ def match_normalizer(list, pathstr: str):
         # Convert odds fields from strings to floats
         for field in odds_fields:
             if field in event and event[field] is not None:
+                try:
+                    event[field] = float(event[field])
+                except (ValueError, TypeError):
+                    logger.warning(f"Could not convert {field}={event[field]} to float")
+                    pass
+
+        # Convert dynamic odds fields (corners, Asian handicap) to floats
+        for field in [k for k in event]:
+            if field.startswith(dynamic_prefixes) and event[field] is not None:
                 try:
                     event[field] = float(event[field])
                 except (ValueError, TypeError):

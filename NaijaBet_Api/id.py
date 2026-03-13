@@ -8,6 +8,8 @@ endpoints = {
         "sports": "https://sports.bet9ja.com/desktop/feapi/PalimpsestAjax/GetSports?DISP=0&v_cache_version=1.164.0.135",
         "leaguetry": "https://sports.bet9ja.com/desktop/feapi/PalimpsestAjax/GetEventsInCouponV2?SCHID=492&DISP=0&MKEY=1&v_cache_version=1.169.1.135",
         "leagues": "https://sports.bet9ja.com/desktop/feapi/PalimpsestAjax/GetEventsInGroupV2?GROUPID={leagueid}&DISP=0&GROUPMARKETID=1&matches=true",  # noqa: E501
+        "corners": "https://sports.bet9ja.com/desktop/feapi/PalimpsestAjax/GetEventsInGroupV2?GROUPID={leagueid}&DISP=0&GROUPMARKETID=216&matches=true",  # noqa: E501
+        "asian_handicap": "https://sports.bet9ja.com/desktop/feapi/PalimpsestAjax/GetEventsInGroupV2?GROUPID={leagueid}&DISP=0&GROUPMARKETID=S_AH&matches=true",  # noqa: E501
         "live": "https://sports.bet9ja.com/desktop/feapi/PalimpsestLiveAjax/GetLiveEventsV3?v_cache_version=1.164.0.135",  # noqa: E501
         "markets": "https://sports.bet9ja.com/desktop/feapi/PalimpsestAjax/GetGroupMarketsById?GROUPID=170880",
         "matches": "https://sports.bet9ja.com/desktop/feapi/PalimpsestAjax/GetEvent?EVENTID=137750929&v_cache_version=1.164.0.135",  # noqa: E501
@@ -292,9 +294,9 @@ class Betid(Enum):
         self.altenar_id = altenar_id
         self.twentytwobet_id = twentytwobet_id
 
-    def to_endpoint(self, betting_site):
+    def to_endpoint(self, betting_site, market_type='leagues'):
         if betting_site == 'bet9ja':
-            endpoint_url = endpoints[betting_site]["leagues"].format(
+            endpoint_url = endpoints[betting_site][market_type].format(
                 leagueid=self.bet9ja_id
             )
         elif betting_site == 'betking':

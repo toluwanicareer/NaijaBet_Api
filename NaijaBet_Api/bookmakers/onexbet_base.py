@@ -20,6 +20,22 @@ ODDS_MAP = {
     (19, 181): "btts_no",
 }
 
+# --- Line-based market group/type constants ---
+# Over/Under goals (G=17): T=9 over, T=10 under, P=line
+_G_GOALS_OU = 17
+_T_GOALS_OVER = 9
+_T_GOALS_UNDER = 10
+
+# Corners Total (G=281): T=1131 over, T=1132 under (full match), P=line
+_G_CORNERS_OU = 281
+_T_CORNERS_OVER = 1131
+_T_CORNERS_UNDER = 1132
+
+# Asian Handicap (G=2854): T=3829 home, T=3830 away, P=handicap line (quarter-lines)
+_G_ASIAN_HC = 2854
+_T_ASIAN_HC_HOME = 3829
+_T_ASIAN_HC_AWAY = 3830
+
 
 class OneXBetBase:
     """
@@ -94,6 +110,48 @@ class OneXBetBase:
                 return None
         return None
 
+    @staticmethod
+    def _pick_asian_handicap(entries: list) -> Dict[str, Any]:
+        """Select the Asian Handicap line closest to 0 and return standardised fields.
+
+        Args:
+            entries: list of (T, P, C) tuples for G=2854.
+
+        Returns:
+            Dict with asian_handicap_1, asian_handicap_2, asian_handicap_line
+            or empty dict if no valid pair found.
+        """
+        home_by_line: Dict[float, float] = {}
+        away_by_line: Dict[float, float] = {}
+        for t, p, c in entries:
+            if p is None:
+                continue
+            if t == _T_ASIAN_HC_HOME:
+                home_by_line[p] = c
+            elif t == _T_ASIAN_HC_AWAY:
+                away_by_line[p] = c
+
+        # Find the home line closest to 0 that also has a matching away entry.
+        # The away entry for a given home line L has P = -L (mirror).
+        best_line = None
+        best_abs = None
+        for line in home_by_line:
+            mirror = -line
+            if mirror in away_by_line:
+                a = abs(line)
+                if best_abs is None or a < best_abs:
+                    best_abs = a
+                    best_line = line
+
+        if best_line is None:
+            return {}
+
+        return {
+            "asian_handicap_1": float(home_by_line[best_line]),
+            "asian_handicap_2": float(away_by_line[-best_line]),
+            "asian_handicap_line": float(best_line),
+        }
+
     def _fetch_event_odds(self, event_id: int) -> Dict[str, Any]:
         """Fetch all odds for a single event from GetGameZip."""
         url = self._build_event_url(event_id)
@@ -109,7 +167,9 @@ class OneXBetBase:
         if not isinstance(val, dict):
             return {}
 
-        odds_dict = {}
+        odds_dict: Dict[str, Any] = {}
+        asian_hc_entries: list = []
+
         for e in val.get("E", []):
             g = e.get("G")
             t = e.get("T")
@@ -123,20 +183,46 @@ class OneXBetBase:
                 odds_dict[field] = float(c)
                 continue
 
-            # Over/Under lines (G=17, T=9 over, T=10 under)
-            if g == 17:
+            # Over/Under goals lines (G=17, T=9 over, T=10 under)
+            if g == _G_GOALS_OU:
                 if p is None:
                     continue
                 line_key = str(p).replace(".", "_")
-                if t == 9:
+                if t == _T_GOALS_OVER:
                     odds_dict[f"over_{line_key}"] = float(c)
-                elif t == 10:
+                elif t == _T_GOALS_UNDER:
                     odds_dict[f"under_{line_key}"] = float(c)
+                continue
+
+            # Corners Over/Under (G=281, T=1131 over, T=1132 under, full match)
+            if g == _G_CORNERS_OU:
+                if p is None:
+                    continue
+                line_key = str(p).replace(".", "_")
+                if t == _T_CORNERS_OVER:
+                    odds_dict[f"corners_over_{line_key}"] = float(c)
+                elif t == _T_CORNERS_UNDER:
+                    odds_dict[f"corners_under_{line_key}"] = float(c)
+                continue
+
+            # Asian Handicap (G=2854) — collect entries, pick best line later
+            if g == _G_ASIAN_HC:
+                asian_hc_entries.append((t, p, c))
+                continue
+
+        # Resolve Asian Handicap to a single best line
+        if asian_hc_entries:
+            odds_dict.update(self._pick_asian_handicap(asian_hc_entries))
 
         return odds_dict
 
     def normalizer(self, data: Any) -> List[Dict[str, Any]]:
-        """Transform LineFeed API response into standardized match dicts."""
+        """Transform LineFeed API response into standardized match dicts.
+
+        The league-list (Get1x2_VZip) payload contains a limited subset of
+        markets per event.  We extract what is available inline; full market
+        depth (all O/U lines, corners, Asian HC) comes from _fetch_event_odds.
+        """
         if not data or not isinstance(data, dict):
             return []
 
@@ -151,7 +237,9 @@ class OneXBetBase:
             if not o1 or not o2:
                 continue
 
-            match_odds = {}
+            match_odds: Dict[str, Any] = {}
+            asian_hc_entries: list = []
+
             for e in event.get("E", []):
                 g = e.get("G")
                 t = e.get("T")
@@ -163,11 +251,30 @@ class OneXBetBase:
                     match_odds[field] = float(c) if c is not None else None
                     continue
 
-                if g == 17 and p == 2.5:
-                    if t == 9:
+                # Goals Over/Under — only extract the 2.5 line from the list view
+                if g == _G_GOALS_OU and p == 2.5:
+                    if t == _T_GOALS_OVER:
                         match_odds["over_2_5"] = float(c) if c is not None else None
-                    elif t == 10:
+                    elif t == _T_GOALS_UNDER:
                         match_odds["under_2_5"] = float(c) if c is not None else None
+                    continue
+
+                # Corners Over/Under (full match, main line only in list view)
+                if g == _G_CORNERS_OU and p is not None:
+                    line_key = str(p).replace(".", "_")
+                    if t == _T_CORNERS_OVER and c is not None:
+                        match_odds[f"corners_over_{line_key}"] = float(c)
+                    elif t == _T_CORNERS_UNDER and c is not None:
+                        match_odds[f"corners_under_{line_key}"] = float(c)
+                    continue
+
+                # Asian Handicap — collect, resolve after loop
+                if g == _G_ASIAN_HC:
+                    asian_hc_entries.append((t, p, c))
+                    continue
+
+            if asian_hc_entries:
+                match_odds.update(self._pick_asian_handicap(asian_hc_entries))
 
             match_dict = {
                 "match": f"{o1} - {o2}",
