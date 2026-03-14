@@ -157,8 +157,8 @@ _OUTCOME_MAP = {
     (4, 86): "asian_handicap_1", (4, 87): "asian_handicap_2",   # Asian Handicap
 }
 
-# Period 66 = Corners in the GR8 Tech feed
-_CORNERS_PERIOD = 66
+# Period 4 = Corners in the GR8 Tech feed
+_CORNERS_PERIOD = 4
 
 # --- SignalR MessagePack protocol helpers ---
 
